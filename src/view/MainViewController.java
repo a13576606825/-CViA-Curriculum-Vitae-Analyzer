@@ -1,6 +1,7 @@
 package view;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import com.sun.prism.impl.Disposer.Record;
 
@@ -25,9 +26,19 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
+import logic.Interpreter;
+import parser.CVReader;
 
 @SuppressWarnings("restriction")
 public class MainViewController extends VBox {
+	
+	private static final String DOC = "doc";
+	private static final String DOCX = "docx";
+	private static final String HTML = "html";
+	private static final String PDF = "pdf";
+	private static final String TXT = "txt";
+	private static final String XLS = "xls";
+	private static final String XML = "xml";
 	
 	private static final String IMPORT_SINGLE_BUTTON_TEXT = "Add a CV";
 	private static final String IMPORT_MULTIPLE_BUTTON_TEXT = "Add CVs";
@@ -52,15 +63,16 @@ public class MainViewController extends VBox {
 	private static final String[] SETTING_TABLE_COLUMN_PROPERTY = {"attribute", "constraint"};
 	
 	private ObservableList<FileObject> fileData = FXCollections.observableArrayList(
-				new FileObject("pdf", "1.pdf"),
-				new FileObject("txt", "2.txt"),
-				new FileObject("xls", "3.xls"),
-				new FileObject("doc", "4.doc")
+//				new FileObject("pdf", "1.pdf"),
+//				new FileObject("txt", "2.txt"),
+//				new FileObject("xls", "3.xls"),
+//				new FileObject("doc", "4.doc")
 			);
 	private ObservableList<Filter> filterData = FXCollections.observableArrayList(
 				new Filter("Skill", "Java"),
-				new Filter("Age", "<30"),
-				new Filter("Major", "Computer Science")
+				new Filter("Major", "Computer Science"),
+				new Filter("Skill", "Software Engineer"),
+				new Filter("Skill", "Android")
 			);
 	
 	private double stageWidth;
@@ -86,7 +98,16 @@ public class MainViewController extends VBox {
 	@SuppressWarnings("rawtypes")
 	private TableView resultTable;
 	
+	private ArrayList<File> originalFileList;
+	private ArrayList<File> textFileList;
+	private ArrayList<String> textFilePathList;
+	
+	private ArrayList<String> filterList;
+	
+	private ArrayList<Integer> scoreList;
+	
 	public MainViewController(double stageWidth, double stageHeight) {
+		initializeList();
 		initializeStageSize(stageWidth, stageHeight);
 		initializeMainView();
 		initializePreprocessBox();
@@ -94,6 +115,16 @@ public class MainViewController extends VBox {
 		initializeResultPane();
 		initializeStyleClass();
 		initializeButtonEventHandler();
+	}
+	
+	private void initializeList() {
+		originalFileList = new ArrayList<File>();
+		textFileList = new ArrayList<File>();
+		textFilePathList = new ArrayList<String>();
+		
+		filterList = new ArrayList<String>();
+		
+		scoreList = new ArrayList<Integer>();
 	}
 	
 	private void initializeStageSize(double stageWidth, double stageHeight) {
@@ -306,9 +337,10 @@ public class MainViewController extends VBox {
 				fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
 				File file = fileChooser.showOpenDialog(importSingleButton.getScene().getWindow());
                 // Process the file
-				if (file != null) {
+				if (file != null && file.isFile()) {
 					System.out.println(file.getName());
-
+					
+					addFile(false, file);
 				}
 			}
 		});
@@ -321,9 +353,13 @@ public class MainViewController extends VBox {
 				dirChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
 				File dir = dirChooser.showDialog(importMultipleButton.getScene().getWindow());
                 // Process the file
-				if (dir != null) {
+				if (dir != null && dir.isDirectory()) {
 					System.out.println(dir.getName());
 					
+					File[] files = dir.listFiles();
+					for (File file : files) {
+						addFile(false, file);
+					}
 				}
 			}
 		});
@@ -338,7 +374,22 @@ public class MainViewController extends VBox {
 		processButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				// process data
+				final String dir = System.getProperty("user.dir");
+		        System.out.println(dir);
+				for (File file : originalFileList) {
+					
+					addFile(true, CVReader.convertFile(file));
+					System.out.println(CVReader.convertFile(file).getAbsolutePath().substring(
+							System.getProperty("user.dir").length() + 1));
+					textFilePathList.add(CVReader.convertFile(file).getAbsolutePath().substring(
+							System.getProperty("user.dir").length() + 1));
+				}
+				setFilterList();
+				scoreList = Interpreter.getQueryScore(textFilePathList, filterList, true);
+				
+				for (Integer score: scoreList) {
+					System.out.println(score);
+				}
 			}
 		});
 		
@@ -348,6 +399,44 @@ public class MainViewController extends VBox {
 				// export data
 			}
 		});
+	}
+	
+	private void setFilterList() {
+		for (Filter filter : settingTable.getItems()) {
+			System.out.println(filter.getConstraint());
+			filterList.add(filter.getConstraint());
+		}
+	}
+	
+	private boolean isCVFileType(String type) {
+		if (!type.equals(DOC) && !type.equals(DOCX) && !type.equals(HTML) &&
+				!type.equals(PDF) && !type.equals(TXT) && !type.equals(XLS) && !type.equals(XML)) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private void addFile(boolean isConverted, File file) {
+		if (isCVFileType(getType(file))) {
+			if (!isConverted) {
+				originalFileList.add(file);
+				fileData.add(new FileObject(getType(file), file.getName()));
+			} else {
+				textFileList.add(file);
+			}
+		}
+	}
+	
+	private String getType(File file) {
+		if (file.exists() && file.isFile()) {
+			String filename = file.getName();
+			String[] tokens = filename.split("\\.(?=[^\\.]+$)");
+			
+			return tokens[1];
+		}
+		
+		return null;
 	}
 	
 	public static class FileObject {

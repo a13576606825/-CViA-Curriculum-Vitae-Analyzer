@@ -15,7 +15,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
   
 public class CVReader {  
-	private static String path = "test/temp";
+	private static String path = "test/temp/";
 	private static String txt = ".txt";
 	private static int txtIndex = 0;
 	private static String pdf = ".pdf";
@@ -23,7 +23,7 @@ public class CVReader {
 //	private static String doc = ".doc";
 //	private static int docIndex = 2;
 	   
-	public static String[] convertDirectory(File directory) {
+	public static File[] convertDirectory(File directory) {
 		if (!directory.exists() || !directory.isDirectory()) {
 			return null;
 		}
@@ -31,18 +31,19 @@ public class CVReader {
 		return convertFileList(files);
 	}
 	
-	public static String[] convertFileList(File[] files) {
-		ArrayList<String> fileNames = new ArrayList<String>();
+	public static File[] convertFileList(File[] files) {
+		ArrayList<File> fileList = new ArrayList<File>();
 		for (int i = 0; i < files.length; i++) {
-			String name = convertFile(files[i]);
-			if (name != null) {
-				fileNames.add(files[i].getName());
+			File file = convertFile(files[i]);
+			if (file != null && file.isFile()) {
+				fileList.add(file);
 			}
 		}
-		return fileNames.toArray(new String[fileNames.size()]);
+		//return fileNames.toArray(new String[fileNames.size()]);
+		return fileList.toArray(new File[fileList.size()]);
 	}
 	
-	public static String convertFile(File file) {
+	public static File convertFile(File file) {
     	File pathCheck = new File(path);
     	if (!pathCheck.exists() || !pathCheck.isDirectory()) {
     		pathCheck.mkdir();
@@ -89,7 +90,7 @@ public class CVReader {
 		return -1;
 	}
 	
-    private static String TXT2TXT(File file) {
+    private static File TXT2TXT(File file) {
 		if (file == null) {
 			return null;
 		}
@@ -117,7 +118,7 @@ public class CVReader {
     		br.close();
 			bw.close();
 			
-			return outFile.getName();
+			return outFile;
         } catch (FileNotFoundException e) {   
             e.printStackTrace();  
         } catch (IOException e) {   
@@ -127,7 +128,7 @@ public class CVReader {
 	}
 
 
-	private static String PDF2TXT(File file) {  
+	private static File PDF2TXT(File file) {  
 		if (file == null) {
 			return null;
 		}
@@ -156,7 +157,7 @@ public class CVReader {
 			bw.write(result);
 			bw.close();
 			
-			return outFile.getName();
+			return outFile;
         } catch (FileNotFoundException e) {
             e.printStackTrace();  
         } catch (IOException e) {
@@ -182,13 +183,13 @@ public class CVReader {
     }
 
     public static void main(String[] args) {
-    	String result = convertFile(new File("test/CVs/LinkedIn/DesmondLim.pdf"));
-    	System.out.println(result);
+    	File result = convertFile(new File("test/CVs/LinkedIn/DesmondLim.pdf"));
+    	System.out.println(result.getName());
     	
-    	String[] results = convertDirectory(new File("test/CVs/LinkedIn"));
+    	File[] results = convertDirectory(new File("test/CVs/LinkedIn"));
     	System.out.println(results.length);
-    	for (String res : results) {
-    		System.out.println(res);
+    	for (File res : results) {
+    		System.out.println(res.getName());
     	}
     }
 
