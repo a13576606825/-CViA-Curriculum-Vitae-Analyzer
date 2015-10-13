@@ -43,8 +43,8 @@ public class Interpreter {
 		ArrayList<String> temp = new ArrayList<String>();
 		ArrayList<String> querystr = new ArrayList<String>();
 		
-		temp.add("test.txt");
-		temp.add("test2.txt");
+		temp.add("temp/test.txt");
+		temp.add("temp/test2.txt");
 		querystr.add("Software Engineer");
 		querystr.add("bachelor of Science in Information Technology");
 		querystr.add("hardware");
