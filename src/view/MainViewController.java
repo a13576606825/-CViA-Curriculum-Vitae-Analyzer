@@ -22,13 +22,15 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
 @SuppressWarnings("restriction")
 public class MainViewController extends VBox {
 	
-	private static final String IMPORT_BUTTON_TEXT = "Add CV(s)";
+	private static final String IMPORT_SINGLE_BUTTON_TEXT = "Add a CV";
+	private static final String IMPORT_MULTIPLE_BUTTON_TEXT = "Add CVs";
 	private static final String SETTING_BUTTON_TEXT = "Add Filter";
 	private static final String PROCESS_BUTTON_TEXT = "Analyse";
 	private static final String EXPORT_BUTTON_TEXT = "Export";
@@ -68,7 +70,8 @@ public class MainViewController extends VBox {
 	private double widthBetweenTable;
 	private double widthBetweenButton;
 	
-	private Button importButton;
+	private Button importSingleButton;
+	private Button importMultipleButton;
 	private Button settingButton;
 	private Button processButton;
 	private Button exportButton;
@@ -97,19 +100,20 @@ public class MainViewController extends VBox {
 		this.stageWidth = stageWidth;
 		this.stageHeight = stageHeight;
 		
-		this.widthBetweenButton = (this.stageWidth - MainViewController.BUTTON_WIDTH*4)/5;
+		this.widthBetweenButton = (this.stageWidth - MainViewController.BUTTON_WIDTH*5)/6;
 		this.widthBetweenTable = (this.stageWidth - MainViewController.TABLE_WIDTH*2)/3;
 	}
 	
 	@SuppressWarnings("rawtypes")
 	private void initializeMainView() {
-		importButton = new Button(IMPORT_BUTTON_TEXT);
+		importSingleButton = new Button(IMPORT_SINGLE_BUTTON_TEXT);
+		importMultipleButton = new Button(IMPORT_MULTIPLE_BUTTON_TEXT);
 		settingButton = new Button(SETTING_BUTTON_TEXT);
 		processButton = new Button(PROCESS_BUTTON_TEXT);
 		exportButton = new Button(EXPORT_BUTTON_TEXT);
 		
 		buttonBox = new HBox();
-		buttonBox.getChildren().addAll(importButton, settingButton, processButton, exportButton);
+		buttonBox.getChildren().addAll(importSingleButton, importMultipleButton, settingButton, processButton, exportButton);
 		
 		fileTable = new TableView<FileObject>();
 		initializeFileTableView(fileTable, FILE_TABLE_COLUMN, FILE_TABLE_COLUMN_PROPERTY);
@@ -262,13 +266,16 @@ public class MainViewController extends VBox {
 	}
 	
 	private void initializeButtonBox() {
-		HBox.setMargin(importButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton));
+		HBox.setMargin(importSingleButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton));
+		HBox.setMargin(importMultipleButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton/2));
 		HBox.setMargin(settingButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton/2));
 		HBox.setMargin(processButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton/2));
 		HBox.setMargin(exportButton, new Insets(PADDING_SIZE, widthBetweenButton, PADDING_SIZE, widthBetweenButton/2));
 		
-		importButton.setMaxSize(BUTTON_WIDTH, BUTTON_HEIGHT);
-		importButton.setMinSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+		importSingleButton.setMaxSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+		importSingleButton.setMinSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+		importMultipleButton.setMaxSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+		importMultipleButton.setMinSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 		settingButton.setMaxSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 		settingButton.setMinSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 		processButton.setMaxSize(BUTTON_WIDTH, BUTTON_HEIGHT);
@@ -291,16 +298,32 @@ public class MainViewController extends VBox {
 	}
 	
 	private void initializeButtonEventHandler() {
-		importButton.setOnAction(new EventHandler<ActionEvent>() {
+		importSingleButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				FileChooser fileChooser = new FileChooser();
-				fileChooser.setTitle("Open a file or folder...");
+				fileChooser.setTitle("Choose a file...");
 				fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
-				File file = fileChooser.showOpenDialog(importButton.getScene().getWindow());
+				File file = fileChooser.showOpenDialog(importSingleButton.getScene().getWindow());
                 // Process the file
 				if (file != null) {
 					System.out.println(file.getName());
+
+				}
+			}
+		});
+		
+		importMultipleButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				DirectoryChooser dirChooser = new DirectoryChooser();
+				dirChooser.setTitle("Choose a folder...");
+				dirChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+				File dir = dirChooser.showDialog(importMultipleButton.getScene().getWindow());
+                // Process the file
+				if (dir != null) {
+					System.out.println(dir.getName());
+					
 				}
 			}
 		});
