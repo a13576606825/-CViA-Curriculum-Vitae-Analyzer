@@ -58,6 +58,7 @@ public class Interpreter {
 
 	public static ArrayList<Integer> getQueryScore(ArrayList<String> fileName1,
 			ArrayList<String> querystr, boolean useSynonymChecker) {
+		
 		fileName = fileName1;
 		score = new ArrayList<Integer>(fileName.size());
 		int pop = 0;
@@ -87,24 +88,21 @@ public class Interpreter {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-
 		}
 
-			// iterate over words associated with the synset
+		// iterate over words associated with the synset
 
-			int count = 0;
-			while (count < querystr.size()) {
-				if (useSynonymChecker) {
-					// look up first sense of the word "dog "
-					Scanner sc = new Scanner(querystr.get(count));
+		int count = 0;
+		while (count < querystr.size()) {
+			if (useSynonymChecker) {
+				// look up first sense of the word "dog "
+				Scanner sc = new Scanner(querystr.get(count));
 					
-					int counter = 0;
-					while (sc.hasNext()) {
-						String nextWord = sc.next();
-						
-						try{
-						IIndexWord idxWord = dict.getIndexWord(nextWord,
-								POS.NOUN);
+//					int counter = 0;
+				while (sc.hasNext()) {
+					String nextWord = sc.next();
+					try {
+						IIndexWord idxWord = dict.getIndexWord(nextWord, POS.NOUN);
 						IWordID wordID = idxWord.getWordIDs().get(0);
 						IWord word = dict.getWord(wordID);
 
@@ -113,23 +111,25 @@ public class Interpreter {
 							//System.out.println(w.getLemma());
 							query(analyzer, index, w.getLemma().replace("_", " "));
 						}
-						}catch (Exception e1){
-							System.out.printf("\n%s not found in dictionary\n\n", nextWord);
-						}
-					}
-				} else {
-					try{
-
-					query(analyzer, index, querystr.get(count));
-					}catch (Exception e2){
-						e2.printStackTrace();
+					}catch (Exception e1){
+						System.out.printf("\n%s not found in dictionary\n\n", nextWord);
 					}
 				}
-				count++;
+				
+				sc.close();
+				
+			} else {
+				try{
+					query(analyzer, index, querystr.get(count));
+				}catch (Exception e2){
+					e2.printStackTrace();
+				}
 			}
-			return score;
+			count++;
+		}
+			
+		return score;
 
-		
 	}
 
 	private static void query(StandardAnalyzer analyzer, Directory index,
@@ -140,8 +140,7 @@ public class Interpreter {
 		int hitsPerPage = 10;
 		IndexReader reader = DirectoryReader.open(index);
 		IndexSearcher searcher = new IndexSearcher(reader);
-		TopScoreDocCollector collector = TopScoreDocCollector
-				.create(hitsPerPage);
+		TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage);
 
 		searcher.search(q, collector);
 		ScoreDoc[] hits = collector.topDocs().scoreDocs;
@@ -165,16 +164,13 @@ public class Interpreter {
 			File file = new File(fileName.get(counter));
 
 			try {
-
 				Scanner sc = new Scanner(file);
-				int count = 0;
+//				int count = 0;
 				String line = new String();
-				;
 
 				while (sc.hasNextLine()) {
 					line = line + "\n" + sc.nextLine();
-
-					count++;
+//					count++;
 				}
 				addDoc(writer, line, fileName.get(counter));
 				sc.close();
