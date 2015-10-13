@@ -37,24 +37,24 @@ public class Interpreter {
 	private static IndexWriter writer;
 	private static ArrayList<Integer> score;
 
-	public static void main(String[] args) {
-		ArrayList<String> temp = new ArrayList<String>();
-		ArrayList<String> querystr = new ArrayList<String>();
-		
-		temp.add("test/rank/test.txt");
-		temp.add("test/rank/test2.txt");
-		querystr.add("Software Engineer");
-		querystr.add("bachelor of Science in Information Technology");
-		querystr.add("hardware");
-		ArrayList <Integer> scores = getQueryScore(temp, querystr, true);
-		int count = 0;
-		// each score at the index is for the file with the same index at the given filenames arraylist from ziyu's part
-		while (count < scores.size()){
-			System.out.printf("%d\n", score.get(count));
-			count++;
-		}
-
-	}
+//	public static void main(String[] args) {
+//		ArrayList<String> temp = new ArrayList<String>();
+//		ArrayList<String> querystr = new ArrayList<String>();
+//		
+//		temp.add("test/rank/test.txt");
+//		temp.add("test/rank/test2.txt");
+//		querystr.add("Software Engineer");
+//		querystr.add("bachelor of Science in Information Technology");
+//		querystr.add("hardware");
+//		ArrayList <Integer> scores = getQueryScore(temp, querystr, true);
+//		int count = 0;
+//		// each score at the index is for the file with the same index at the given filenames arraylist from ziyu's part
+//		while (count < scores.size()){
+//			System.out.printf("%d\n", score.get(count));
+//			count++;
+//		}
+//
+//	}
 
 	public static ArrayList<Integer> getQueryScore(ArrayList<String> fileName1,
 			ArrayList<String> querystr, boolean useSynonymChecker) {

@@ -182,15 +182,15 @@ public class CVReader {
     	return null;
     }
 
-    public static void main(String[] args) {
-    	File result = convertFile(new File("test/CVs/LinkedIn/DesmondLim.pdf"));
-    	System.out.println(result.getName());
-    	
-    	File[] results = convertDirectory(new File("test/CVs/LinkedIn"));
-    	System.out.println(results.length);
-    	for (File res : results) {
-    		System.out.println(res.getName());
-    	}
-    }
+//    public static void main(String[] args) {
+//    	File result = convertFile(new File("test/CVs/LinkedIn/DesmondLim.pdf"));
+//    	System.out.println(result.getName());
+//    	
+//    	File[] results = convertDirectory(new File("test/CVs/LinkedIn"));
+//    	System.out.println(results.length);
+//    	for (File res : results) {
+//    		System.out.println(res.getName());
+//    	}
+//    }
 
 }  
