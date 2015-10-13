@@ -78,10 +78,10 @@ public class MainViewController extends VBox {
 //				new FileObject("doc", "4.doc")
 			);
 	private ObservableList<Filter> filterData = FXCollections.observableArrayList(
-				new Filter("Skill", "Java"),
-				new Filter("Major", "Computer Science"),
-				new Filter("Skill", "Software Engineer"),
-				new Filter("Skill", "Android")
+//				new Filter("Skill", "Java"),
+//				new Filter("Major", "Computer Science"),
+//				new Filter("Skill", "Software Engineer"),
+//				new Filter("Skill", "Android")
 			);
 	
 	private ObservableList<EvaluatedRecord> resultData = FXCollections.observableArrayList();
