@@ -1,6 +1,9 @@
 package view;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import com.sun.prism.impl.Disposer.Record;
@@ -56,11 +59,17 @@ public class MainViewController extends VBox {
 	
 	private static final double PADDING_SIZE = 20;
 	
+//	private static final double MAX_SCORE = 100;
+	private static final String EXPORT_FILE_NAME = "result";
+	
 	private static final String[] FILE_TABLE_COLUMN = {"Type", "Filename"};
 	private static final String[] FILE_TABLE_COLUMN_PROPERTY = {"type", "filename"};
 	
 	private static final String[] SETTING_TABLE_COLUMN = {"Attribute", "Constraint"};
 	private static final String[] SETTING_TABLE_COLUMN_PROPERTY = {"attribute", "constraint"};
+	
+	private static final String[] RESULT_TABLE_COLUMN = {"Filename", "Score"};
+	private static final String[] RESULT_TABLE_COLUMN_PROPERTY = {"filename", "score"};
 	
 	private ObservableList<FileObject> fileData = FXCollections.observableArrayList(
 //				new FileObject("pdf", "1.pdf"),
@@ -74,6 +83,8 @@ public class MainViewController extends VBox {
 				new Filter("Skill", "Software Engineer"),
 				new Filter("Skill", "Android")
 			);
+	
+	private ObservableList<EvaluatedRecord> resultData = FXCollections.observableArrayList();
 	
 	private double stageWidth;
 	@SuppressWarnings("unused")
@@ -95,8 +106,7 @@ public class MainViewController extends VBox {
 	
 	private TableView<FileObject> fileTable;
 	private TableView<Filter> settingTable;
-	@SuppressWarnings("rawtypes")
-	private TableView resultTable;
+	private TableView<EvaluatedRecord> resultTable;
 	
 	private ArrayList<File> originalFileList;
 	private ArrayList<File> textFileList;
@@ -112,7 +122,7 @@ public class MainViewController extends VBox {
 		initializeMainView();
 		initializePreprocessBox();
 		initializeButtonBox();
-		initializeResultPane();
+		initializeResultBox();
 		initializeStyleClass();
 		initializeButtonEventHandler();
 	}
@@ -135,7 +145,6 @@ public class MainViewController extends VBox {
 		this.widthBetweenTable = (this.stageWidth - MainViewController.TABLE_WIDTH*2)/3;
 	}
 	
-	@SuppressWarnings("rawtypes")
 	private void initializeMainView() {
 		importSingleButton = new Button(IMPORT_SINGLE_BUTTON_TEXT);
 		importMultipleButton = new Button(IMPORT_MULTIPLE_BUTTON_TEXT);
@@ -157,7 +166,9 @@ public class MainViewController extends VBox {
 		preprocessBox = new HBox();
 		preprocessBox.getChildren().addAll(fileTable, settingTable);
 		
-		resultTable = new TableView();
+		resultTable = new TableView<EvaluatedRecord>();
+		initializeResultTableView(resultTable, RESULT_TABLE_COLUMN, RESULT_TABLE_COLUMN_PROPERTY);
+		resultTable.setItems(resultData);
 		
 		resultBox = new VBox();
 		resultBox.getChildren().addAll(resultTable);
@@ -231,6 +242,35 @@ public class MainViewController extends VBox {
 			table.getColumns().add(tableColumn);
 		}
 		addDeleteButtonToSettingTable();
+		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		table.setEditable(true);
+	}
+	
+	private void initializeResultTableView(TableView<EvaluatedRecord> table, String[] columns, String[] columnProperties) {
+		for (int i=0; i<columns.length; i++) {
+			int currentIndex = i;
+			TableColumn<EvaluatedRecord, String> tableColumn = new TableColumn<EvaluatedRecord, String>(columns[i]);
+			tableColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+			tableColumn.setOnEditCommit(new EventHandler<CellEditEvent<EvaluatedRecord, String>>() {
+				@Override
+				public void handle(CellEditEvent<EvaluatedRecord, String> event) {
+					EvaluatedRecord file = (EvaluatedRecord) event.getTableView().getItems().get(event.getTablePosition().getRow());
+					switch (currentIndex) {
+						case 0:
+							file.setFilename(event.getNewValue());
+							break;
+						case 1:
+							file.setScore(event.getNewValue());
+							break;
+						default:
+							break;
+					}
+				}	
+			});
+			tableColumn.setCellValueFactory(new PropertyValueFactory<EvaluatedRecord, String>(columnProperties[i]));
+			table.getColumns().add(tableColumn);
+		}
+
 		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		table.setEditable(true);
 	}
@@ -315,7 +355,7 @@ public class MainViewController extends VBox {
 		exportButton.setMinSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 	}
 	
-	private void initializeResultPane() {
+	private void initializeResultBox() {
 		VBox.setMargin(resultTable, new Insets(PADDING_SIZE, PADDING_SIZE, PADDING_SIZE, PADDING_SIZE));
 		
 		resultBox.setMaxSize(RESULT_TABLE_WIDTH, RESULT_TABLE_HEIGHT);
@@ -387,8 +427,11 @@ public class MainViewController extends VBox {
 				setFilterList();
 				scoreList = Interpreter.getQueryScore(textFilePathList, filterList, true);
 				
-				for (Integer score: scoreList) {
-					System.out.println(score);
+				for (int i=0; i<scoreList.size(); i++) {
+					System.out.println(scoreList.get(i));
+					
+					resultData.add(new EvaluatedRecord(originalFileList.get(i).getName(),
+							scoreList.get(i).toString()));
 				}
 			}
 		});
@@ -396,7 +439,36 @@ public class MainViewController extends VBox {
 		exportButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				// export data
+				DirectoryChooser dirChooser = new DirectoryChooser();
+				dirChooser.setTitle("Choose a folder...");
+				dirChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+				File dir = dirChooser.showDialog(importMultipleButton.getScene().getWindow());
+				
+				if (dir != null && dir.isDirectory()) {
+					System.out.println(dir.getAbsolutePath() + "/" + EXPORT_FILE_NAME + "." + TXT);
+					File exportFile = new File(dir.getAbsolutePath() + "/" + EXPORT_FILE_NAME + "." + TXT);
+					if (!exportFile.exists()) {
+						try {
+							exportFile.createNewFile();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					
+					try {
+						BufferedWriter bw = new BufferedWriter(new FileWriter(exportFile.getAbsolutePath()));
+						
+						for (int i=0; i<resultData.size(); i++) {
+							bw.write(resultData.get(i).getFilename() + "   " + resultData.get(i).getScore());
+							bw.newLine();
+							bw.flush();
+						}
+						
+						bw.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		});
 	}
@@ -488,6 +560,32 @@ public class MainViewController extends VBox {
 		
 		public void setConstraint(String constraint) {
 			this.constraint.set(constraint);
+		}
+	}
+	
+	public static class EvaluatedRecord {
+		private final SimpleStringProperty filename;
+		private final SimpleStringProperty score;
+		
+		public EvaluatedRecord(String filename, String score) {
+			this.filename = new SimpleStringProperty(filename);
+			this.score = new SimpleStringProperty(score);
+		}
+		
+		public String getFilename() {
+			return filename.get();
+		}
+		
+		public void setFilename(String filename) {
+			this.filename.set(filename);
+		}
+		
+		public String getScore() {
+			return score.get();
+		}
+		
+		public void setScore(String score) {
+			this.score.set(score);
 		}
 	}
 	
