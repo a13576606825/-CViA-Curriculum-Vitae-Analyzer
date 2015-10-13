@@ -1,7 +1,6 @@
 package logic;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.*;
 
 import edu.mit.jwi.Dictionary;
 import edu.mit.jwi.IDictionary;
@@ -43,8 +41,8 @@ public class Interpreter {
 		ArrayList<String> temp = new ArrayList<String>();
 		ArrayList<String> querystr = new ArrayList<String>();
 		
-		temp.add("temp/test.txt");
-		temp.add("temp/test2.txt");
+		temp.add("test/rank/test.txt");
+		temp.add("test/rank/test2.txt");
 		querystr.add("Software Engineer");
 		querystr.add("bachelor of Science in Information Technology");
 		querystr.add("hardware");
@@ -81,7 +79,7 @@ public class Interpreter {
 			writer.close();
 
 			URL url = new URL("file", null,
-					"C:/Program Files (x86)/WordNet/2.1/dict");
+					"lib/WordNet-2.1/dict/");
 
 			// construct the dictionary object and open it
 		 dict = new Dictionary(url);

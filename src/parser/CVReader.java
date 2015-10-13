@@ -4,60 +4,62 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;  
-import java.io.FileNotFoundException;  
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;  
+import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
   
 public class CVReader {  
-	private static String path = "temp/";
+	private static String path = "test/temp";
 	private static String txt = ".txt";
 	private static int txtIndex = 0;
 	private static String pdf = ".pdf";
 	private static int pdfIndex = 1;
-	private static String doc = ".doc";
-	private static int doxIndex = 2;
+//	private static String doc = ".doc";
+//	private static int docIndex = 2;
 	   
-	public static String[] convertDirectory(File directory){
-		if(!directory.exists() || !directory.isDirectory()){
+	public static String[] convertDirectory(File directory) {
+		if (!directory.exists() || !directory.isDirectory()) {
 			return null;
 		}
 		File[] files = directory.listFiles();
 		return convertFileList(files);
 	}
 	
-	public static String[] convertFileList(File[] files){
-		int size = files.length;
-		String[] fileNames = new String[size];
-		for(int i = 0; i < size; i++){
-			fileNames[i] = convertFile(files[i]);
+	public static String[] convertFileList(File[] files) {
+		ArrayList<String> fileNames = new ArrayList<String>();
+		for (int i = 0; i < files.length; i++) {
+			String name = convertFile(files[i]);
+			if (name != null) {
+				fileNames.add(files[i].getName());
+			}
 		}
-		return fileNames;
+		return fileNames.toArray(new String[fileNames.size()]);
 	}
 	
-	public static String convertFile(File file){
-    	File pathCheck = new File("temp");
-    	if(!pathCheck.exists() || !pathCheck.isDirectory()){
+	public static String convertFile(File file) {
+    	File pathCheck = new File(path);
+    	if (!pathCheck.exists() || !pathCheck.isDirectory()) {
     		pathCheck.mkdir();
     	}
     	
-    	if(!file.exists() || !file.isFile()){
+    	if (!file.exists() || !file.isFile()) {
     		return null;
     	}
     		
     	String fileName = file.getName();
     	int fileType = checkFiletype(fileName);
     	
-    	if(fileType == txtIndex){
+    	if (fileType == txtIndex) {
     		return TXT2TXT(file);
     	}
     	
-    	if(fileType == pdfIndex){
+    	if (fileType == pdfIndex) {
     		return PDF2TXT(file);
     	}
     	
@@ -67,10 +69,10 @@ public class CVReader {
 
 	private static String getFileName(String fileName) {
     	int fileType = checkFiletype(fileName);
-    	if(fileType == pdfIndex){
+    	if (fileType == pdfIndex) {
     		return fileName.replace(pdf, "").trim();
     	}
-    	if(fileType == txtIndex){
+    	if (fileType == txtIndex) {
     		return fileName.replace(txt, "").trim();
     	}
 		return null;
@@ -78,17 +80,17 @@ public class CVReader {
 
 
 	private static int checkFiletype(String fileName) {
-    	if(fileName.contains(txt)){
+    	if (fileName.contains(txt)) {
     		return txtIndex;
     	}
-    	if(fileName.contains(pdf)){
+    	if (fileName.contains(pdf)) {
     		return pdfIndex;
     	}
 		return -1;
 	}
 	
     private static String TXT2TXT(File file) {
-		if(file == null){
+		if (file == null) {
 			return null;
 		}
 		
@@ -116,19 +118,17 @@ public class CVReader {
 			bw.close();
 			
 			return outFile.getName();
-        } catch (FileNotFoundException e) {  
-            // TODO Auto-generated catch block  
+        } catch (FileNotFoundException e) {   
             e.printStackTrace();  
-        } catch (IOException e) {  
-            // TODO Auto-generated catch block  
+        } catch (IOException e) {   
             e.printStackTrace();  
         }
 		return null;
 	}
 
 
-	private static String PDF2TXT(File file){  
-		if(file == null){
+	private static String PDF2TXT(File file) {  
+		if (file == null) {
 			return null;
 		}
 		
@@ -157,26 +157,22 @@ public class CVReader {
 			bw.close();
 			
 			return outFile.getName();
-        } catch (FileNotFoundException e) {  
-            // TODO Auto-generated catch block  
+        } catch (FileNotFoundException e) {
             e.printStackTrace();  
-        } catch (IOException e) {  
-            // TODO Auto-generated catch block  
+        } catch (IOException e) {
             e.printStackTrace();  
-        } finally {  
+        } finally {
             if (is != null) {  
                 try {  
                     is.close();  
-                } catch (IOException e) {  
-                    // TODO Auto-generated catch block  
+                } catch (IOException e) {
                     e.printStackTrace();  
                 }  
             }  
             if (document != null) {  
                 try {
                     document.close();  
-                } catch (IOException e) {  
-                    // TODO Auto-generated catch block  
+                } catch (IOException e) {
                     e.printStackTrace();  
                 }  
             }  
@@ -184,13 +180,16 @@ public class CVReader {
         
     	return null;
     }
-    
-    //*
-    public static void main(String args[]){
+
+    public static void main(String[] args) {
     	String result = convertFile(new File("test/CVs/LinkedIn/DesmondLim.pdf"));
     	System.out.println(result);
     	
-    	convertDirectory(new File("test/CVs/LinkedIn"));
+    	String[] results = convertDirectory(new File("test/CVs/LinkedIn"));
+    	System.out.println(results.length);
+    	for (String res : results) {
+    		System.out.println(res);
+    	}
     }
-    //*/
+
 }  
