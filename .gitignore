@@ -4,7 +4,7 @@
 target/
 /temp/
 /test/
-
+/lib/WordNet-2.1/
 
 # OS Files #
 .DS_Store
