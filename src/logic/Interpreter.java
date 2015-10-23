@@ -80,7 +80,7 @@ public class Interpreter {
 			writer.close();
 
 			URL url = new URL("file", null,
-					"lib/WordNet-2.1/dict/");
+					"/usr/local/Cellar/wordnet/3.1/dict");
 
 			// construct the dictionary object and open it
 		 dict = new Dictionary(url);
