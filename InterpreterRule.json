@@ -6,31 +6,48 @@
             ],
             "secondaryKeys":[
                 "information",
-                "personal"
+                "personal",
+                "detail"
             ],
-            "multipleEntry":false
-        },
-        "data":[
-            {
-                "name":"email",
-                "hasPredefinedValues":true,
-                "predefinedValuesType":"Email"
-            },
-            {
-                "name":"mobile",
-                "hasPredefinedValues":true,
-                "predefinedValuesType":"Number"
-            },
-            {
-                "name":"address",
-                "hasPredefinedValues":true,
-                "predefinedValuesType":"Date"
-            },
-            {
-                "name":"info",
-                "hasPredefinedValues":false
-            }
-        ]
+            "multipleEntry":false,
+            "data":[
+                {
+                    "name":"email",
+                    "predefinedValuesType":"Email"
+                },
+                {
+                    "name":"mobile",
+                    "predefinedValuesType":"Number"
+                },
+                {
+                    "name":"info",
+                    "predefinedValuesType":"Info"
+                }
+            ]
+        }
+    },
+    {
+        "workExperience":{
+            "primaryKeys":[
+                "experience",
+                "work"
+            ],
+            "secondaryKeys":[
+                "past",
+                "experience"
+            ],
+            "multipleEntry":true,
+            "data":[
+                {
+                    "name":"duration",
+                    "predefinedValuesType":"Date"
+                },
+                {
+                    "name":"info",
+                    "predefinedValuesType":"Info"
+                }
+            ]
+        }
     },
     {
         "education":{
@@ -41,24 +58,26 @@
                 "educational",
                 "qualification"
             ],
-            "multipleEntry":true
-        },
-        "data":[
-            {
-                "name":"educationLevel",
-                "hasPredefinedValues":true,
-                "predefinedValuesType":"EducationLevel"
-            },
-            {
-                "name":"date",
-                "hasPredefinedValues":true,
-                "predefinedValuesType":"Date"
-            },
-            {
-                "name":"info",
-                "hasPredefinedValues":false
-            }
-        ]
+            "multipleEntry":true,
+            "data":[
+                {
+                    "name":"educationLevel",
+                    "predefinedValuesType":"EducationLevel"
+                },
+                {
+                    "name":"date",
+                    "predefinedValuesType":"Date"
+                },
+                {
+                    "name":"info",
+                    "predefinedValuesType":"Info"
+                },
+                {
+                    "name":"gpa",
+                    "predefinedValuesType":"GPA"
+                }
+            ]
+        }
     },
     {
         "summary":{
@@ -70,14 +89,14 @@
                 "key",
                 "qualification"
             ],
-            "multipleEntry":false
-        },
-        "data":[
-            {
-                "name":"info",
-                "hasPredefinedValues":false
-            }
-        ]
+            "multipleEntry":false,
+            "data":[
+                {
+                    "name":"info",
+                    "predefinedValuesType":"Info"
+                }
+            ]
+        }
     },
     {
         "skill":{
@@ -87,14 +106,14 @@
             "secondaryKeys":[
                 "abality"
             ],
-            "multipleEntry":false
-        },
-        "data":[
-            {
-                "name":"info",
-                "hasPredefinedValues":false
-            }
-        ]
+            "multipleEntry":false,
+            "data":[
+                {
+                    "name":"info",
+                    "predefinedValuesType":"Info"
+                }
+            ]
+        }
     },
     {
         "publication":{
@@ -103,34 +122,34 @@
                 "paper"
             ],
             "secondaryKeys":[
-
+                "publication"
             ],
-            "multipleEntry":false
-        },
-        "data":[
-            {
-                "name":"info",
-                "hasPredefinedValues":false
-            }
-        ]
+            "multipleEntry":false,
+            "data":[
+                {
+                    "name":"info",
+                    "predefinedValuesType":"Info"
+                }
+            ]
+        }
     },
     {
         "voluteer":{
             "primaryKeys":[
-                "voluteer",
-                "paper"
+                "voluteer"
+                
             ],
             "secondaryKeys":[
 
             ],
-            "multipleEntry":false
-        },
-        "data":[
-            {
-                "name":"info",
-                "hasPredefinedValues":false
-            }
-        ]
+            "multipleEntry":false,
+            "data":[
+                {
+                    "name":"info",
+                    "predefinedValuesType":"Info"
+                }
+            ]
+        }
     },
     {
         "interest":{
@@ -139,51 +158,49 @@
                 "hobby"
             ],
             "secondaryKeys":[
-
             ],
-            "multipleEntry":false
-        },
-        "data":[
-            {
-                "name":"info",
-                "hasPredefinedValues":false
-            }
-        ]
+            "multipleEntry":false,
+            "data":[
+                {
+                    "name":"info",
+                    "predefinedValuesType":"Info"
+                }
+            ]
+        }
     },
     {
         "referee":{
             "primaryKeys":[
-                "referee",
-                ""
+                "referee"
             ],
             "secondaryKeys":[
-
+                "referee"
             ],
-            "multipleEntry":false
-        },
-        "data":[
-            {
-                "name":"info",
-                "hasPredefinedValues":false
-            }
-        ]
+            "multipleEntry":false,
+            "data":[
+                {
+                    "name":"info",
+                    "predefinedValuesType":"Info"
+                }
+            ]
+        }
     },
     {
         "achievement":{
             "primaryKeys":[
-                "achievement",
-                ""
+                "achievement"
+                
             ],
             "secondaryKeys":[
-
+                "achievement"
             ],
-            "multipleEntry":false
-        },
-        "data":[
-            {
-                "name":"info",
-                "hasPredefinedValues":false
-            }
-        ]
+            "multipleEntry":false,
+            "data":[
+                {
+                    "name":"info",
+                    "predefinedValuesType":"Info"
+                }
+            ]
+        }
     }
 ]

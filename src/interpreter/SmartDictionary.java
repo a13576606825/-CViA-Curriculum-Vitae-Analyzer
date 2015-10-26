@@ -43,13 +43,15 @@ public class SmartDictionary {
 		if(dict == null || !dict.isOpen()) {
 			initDict();
 		}
-		
+		if(word == null || anoWord== null||word.trim() == "" || anoWord.trim() == "") {
+			return false;
+		}
 		List<String> l1 = stemmer.findStems(word.trim(),  null);
 		List<String> l2 = stemmer.findStems(anoWord.trim(),  null);
-		Utils.debug(l1.size() + " " + l2.size());
+//		Utils.debug(l1.size() + " " + l2.size());
 		for(String a : l1) {
 			for(String b : l2) {
-				Utils.debug("a: " + a +"   " + "b: " + b); 
+				 
 				if(!a.isEmpty() && a != null && a.equalsIgnoreCase(b)){
 					return true;
 				}
