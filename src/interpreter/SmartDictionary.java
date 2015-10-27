@@ -43,7 +43,7 @@ public class SmartDictionary {
 		if(dict == null || !dict.isOpen()) {
 			initDict();
 		}
-		if(word == null || anoWord== null||word.trim() == "" || anoWord.trim() == "") {
+		if(word == null || anoWord == null || word.trim().equals("") || anoWord.trim().equals("")) {
 			return false;
 		}
 		List<String> l1 = stemmer.findStems(word.trim(),  null);

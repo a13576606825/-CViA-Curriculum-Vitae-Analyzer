@@ -20,7 +20,7 @@ public class PredefinedValuesFactory {
 	
 	// empty string means no value can be obtained
 	public static PredefinedValue getValue(String line, String type) {
-		if(!PredefinedValuesType.doesTypeExist(type)) {
+		if(PredefinedValuesType.doesTypeExist(type)) {
 			if(PredefinedValuesType.Email.equalsName(type)) {
 				return getEmail(line);
 			} else if(PredefinedValuesType.GPA.equalsName(type)) {
@@ -39,7 +39,7 @@ public class PredefinedValuesFactory {
 	}
 	
 	public static PredefinedValue getGPA(String line) {
-		Pattern p = Pattern.compile("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?/[0-9]",
+		Pattern p = Pattern.compile("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?/[0-9]*",
 			    Pattern.CASE_INSENSITIVE);
 		Matcher matcher = p.matcher(line);
 		Set<PredefinedValue> emails = new HashSet<PredefinedValue>();
@@ -63,8 +63,8 @@ public class PredefinedValuesFactory {
 			}
 		}
 		
-		if(currentNumber.length() >= 8) {
-			return new SmartNumber(currentNumber);
+		if(currentNumber.trim().length() >= 8) {
+			return new SmartNumber(currentNumber.trim());
 		}
 		return null;
 	}
@@ -92,11 +92,11 @@ public class PredefinedValuesFactory {
 	public static PredefinedValue getEducationLevel(String line) {
 		Set<PredefinedValue> levels = new HashSet<PredefinedValue>();
 		String[] phd = {"PhD"};
-		String[] master ={"Master","M.A", "M.S", "M.Ed.", "M.E.B", "M.Des", "M.N.C.M.", "M.S.N.", "M.S.W.",
+		String[] master ={"MSc", "Master","M.A", "M.S", "M.Ed.", "M.E.B", "M.Des", "M.N.C.M.", "M.S.N.", "M.S.W.",
 				"M.P.A.", "M.P.C.", "M.P.P.", "M.P.H.", "M.C.", "M.C.A.", "M.Couns.", "M.L.A.", "M.L.I.S.", 
 				"M.Div.", "A.L.M.", "M.M.", "M.B.A.", "M.Tech.", "M.I.T.B.", "M.B.E.", "M.Com.", "M.I.B.", "M.I.", "P.S.M."};
 		
-		String[] bachelor = {"Bachelor"};
+		String[] bachelor = {"Bachelor", "BE"};
 		if(containsStringIgnoreCases(phd, line)) {
 			return new SmartEducationLevel(SmartEducationLevel.phd);
 			
@@ -147,18 +147,18 @@ public class PredefinedValuesFactory {
 		return null;
 	}
 
-	public static void main(String[] args) {
-		String toTestEducationLevel = "• M.Sc. (Integrated) in Physics (July 2010)      GPA: 7.3/10 ";
-		
-//		Utils.debug(getEducationLevel(toTestEducationLevel).toString());
-		String toTestNumber = "National University of Singapore  Phone: +65 98632702 ";
-//		Utils.debug(getNumber(toTestNumber).toString());
-		String toTestEmail = "Research Assistant                E-mail: deorani@gmail.com; elepd@nus.edu.sg";
-		
-//		Utils.debug(getEmail(toTestEmail).toString());
-//		Utils.debug(getDuration("• Research Scholar  Jan 2011 – present ").toString());
-//		Utils.debug(getDate("now").toString());
-//		getDuration(" Jan 2010 - now ");
-	}
+//	public static void main(String[] args) {
+//		String toTestEducationLevel = "• M.Sc. (Integrated) in Physics (July 2010)      GPA: 7.3/10 ";
+//		
+////		Utils.debug(getEducationLevel(toTestEducationLevel).toString());
+//		String toTestNumber = "National University of Singapore  Phone: +65 98632702 ";
+////		Utils.debug(getNumber(toTestNumber).toString());
+//		String toTestEmail = "Research Assistant                E-mail: deorani@gmail.com; elepd@nus.edu.sg";
+//		
+////		Utils.debug(getEmail(toTestEmail).toString());
+////		Utils.debug(getDuration("• Research Scholar  Jan 2011 – present ").toString());
+////		Utils.debug(getDate("now").toString());
+////		getDuration(" Jan 2010 - now ");
+//	}
 }
 

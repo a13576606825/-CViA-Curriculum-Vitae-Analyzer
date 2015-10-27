@@ -26,6 +26,25 @@
             ]
         }
     },
+     {
+        "volunteer":{
+            "primaryKeys":[
+                "volunteer"
+                
+            ],
+            "secondaryKeys":[
+                "volunteer",
+                "experience"
+            ],
+            "multipleEntry":false,
+            "data":[
+                {
+                    "name":"info",
+                    "predefinedValuesType":"Info"
+                }
+            ]
+        }
+    },
     {
         "workExperience":{
             "primaryKeys":[
@@ -40,7 +59,7 @@
             "data":[
                 {
                     "name":"duration",
-                    "predefinedValuesType":"Date"
+                    "predefinedValuesType":"Duration"
                 },
                 {
                     "name":"info",
@@ -61,20 +80,16 @@
             "multipleEntry":true,
             "data":[
                 {
+                    "name":"gpa",
+                    "predefinedValuesType":"GPA"
+                },
+                {
                     "name":"educationLevel",
                     "predefinedValuesType":"EducationLevel"
                 },
                 {
-                    "name":"date",
-                    "predefinedValuesType":"Date"
-                },
-                {
                     "name":"info",
                     "predefinedValuesType":"Info"
-                },
-                {
-                    "name":"gpa",
-                    "predefinedValuesType":"GPA"
                 }
             ]
         }
@@ -87,6 +102,7 @@
             ],
             "secondaryKeys":[
                 "key",
+                "qualifications",
                 "qualification"
             ],
             "multipleEntry":false,
@@ -124,6 +140,29 @@
             "secondaryKeys":[
                 "publication"
             ],
+            "multipleEntry":true,
+            "data":[
+                {
+                    "name":"info",
+                    "predefinedValuesType":"Info"
+                },
+                {
+                    "name":"date",
+                    "predefinedValuesType":"Date"
+                }
+            ]
+        }
+    },
+    {
+        "cca":{
+            "primaryKeys":[
+                "Extracurricular",
+                "CCA"
+                
+            ],
+            "secondaryKeys":[
+                "activities"
+            ],
             "multipleEntry":false,
             "data":[
                 {
@@ -133,10 +172,11 @@
             ]
         }
     },
+   
     {
-        "voluteer":{
+        "language":{
             "primaryKeys":[
-                "voluteer"
+                "language"
                 
             ],
             "secondaryKeys":[
@@ -151,6 +191,25 @@
             ]
         }
     },
+        {
+        "certification":{
+            "primaryKeys":[
+                "certification"
+                
+            ],
+            "secondaryKeys":[
+
+            ],
+            "multipleEntry":false,
+            "data":[
+                {
+                    "name":"info",
+                    "predefinedValuesType":"Info"
+                }
+            ]
+        }
+    },
+    
     {
         "interest":{
             "primaryKeys":[

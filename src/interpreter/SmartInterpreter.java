@@ -3,9 +3,11 @@ package interpreter;
 import interpreter.CategoryRule.CategoryEntry;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +24,8 @@ public class SmartInterpreter {
 
 	private static JSONObject exportDataMap;
 	private String currentCategory;
-	private ArrayList<HashMap<String, PredefinedValue>> currentDataMap; 
+	// first string is value name, second is value 
+	private ArrayList<JSONObject> currentDataMap; 
 	private File toInterprete;
 	private String infoBuffer = "";
 	
@@ -30,7 +33,7 @@ public class SmartInterpreter {
 		toInterprete = text;
 		exportDataMap = new JSONObject();
 		currentCategory = InterpreterRule.startCategory;
-		currentDataMap = new ArrayList<HashMap<String, PredefinedValue>>();
+		currentDataMap = new ArrayList<JSONObject>();
 	}
 	
 	public void build() {
@@ -40,6 +43,10 @@ public class SmartInterpreter {
 		    	Utils.debug("Prcoess line: " + line);
 		    	processLine(line); // process the line.
 		    }
+		    
+		    finalizeCategory();
+			currentDataMap.clear();
+			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -47,83 +54,123 @@ public class SmartInterpreter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		Utils.debug(exportDataMap.toJSONString());
+		String fileName = toInterprete.getName().substring(0, toInterprete.getName().indexOf("."));
+		String export = Utils.TEST_TEMP_PATH+ fileName +".json";
+		File file = new File(export);
+		// if file doesnt exists, then create it
+		try {
+			if (!file.exists()) {
+				file.delete();
+				file.createNewFile();
+			}
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(exportDataMap.toJSONString());
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
-	
+
 	public void processLine(String line) {
 		String possibleNewCate = InterpreterRule.isNewCategory(line);
 		if(possibleNewCate != InterpreterRule.InvalidCategory) {
 			Utils.debug("-----------------Foudn a new Category:" +possibleNewCate+"-----------------");
 			
-			if(!exportDataMap.containsKey(currentCategory)){
-				JSONArray categoryData = exportCategoryData();
-				exportDataMap.put(currentCategory, categoryData);
-			} else {
-				JSONArray original = (JSONArray) exportDataMap.get(currentCategory);
-				JSONArray categoryData = exportCategoryData();
-				for(Iterator itr = categoryData.iterator(); itr.hasNext();) {
-					original.add(itr.next());
-				}
-				exportDataMap.put(currentCategory, original);
-			}
-
+			finalizeCategory();
 			currentCategory = possibleNewCate;
-			currentDataMap.clear();
+			
+			
 			return;
 		} 
 		
 		CategoryRule catRule = InterpreterRule.getRuleForCategory(currentCategory);
 		
-		infoBuffer+= line;
+		
 		
 		ArrayList<CategoryEntry> entries = catRule.getCategoryEntries();
 		for(CategoryEntry entry: entries) {
 			
 			String valueType = entry.type;
 			PredefinedValue v = PredefinedValuesFactory.getValue(line, valueType);
+			
 			if(v != null) {
-				addValueToCurrentDataMap(entry.name, v);
+				addValueToCurrentDataMap(entry.name, v.toString());
+				Utils.debug("-----------------Foudn a new definedValue of type:" +v.getType().toString()+"-----------------");
+				
 			}
 		}
+		
+		infoBuffer+= (line + " ");
 	}
+	private void finalizeCategory() {
+		
+		
+		if(!exportDataMap.containsKey(currentCategory)){
+			JSONArray categoryData = exportCategoryData();
+			exportDataMap.put(currentCategory, categoryData);
+		} else {
+			JSONArray original = (JSONArray) exportDataMap.get(currentCategory);
+			JSONArray categoryData = exportCategoryData();
+			for(Iterator itr = categoryData.iterator(); itr.hasNext();) {
+				original.add(itr.next());
+			}
+			exportDataMap.put(currentCategory, original);
+		}
+		currentDataMap.clear();
+	}
+
 	private JSONArray exportCategoryData() {
+		pushBufferInfo();
 		JSONArray returned = new JSONArray();
 		CategoryRule catRule = InterpreterRule.getRuleForCategory(currentCategory);
-		for(HashMap<String, PredefinedValue> map:currentDataMap) {
-			JSONObject cur = new JSONObject(); 
-			for(Iterator<String> itr = (Iterator<String>) map.keySet(); itr.hasNext();) {
-				String key = itr.next();
-				cur.put(key, map.get(key));
-			}
+		for(JSONObject map:currentDataMap) {
 			returned.add(map);
 		}
 		return returned;
 		 
 		
 	}
-	private void addValueToCurrentDataMap(String name, PredefinedValue value) {
+	private void addValueToCurrentDataMap(String name, String value) {
 		if(currentDataMap.size() == 0) {
-			HashMap<String, PredefinedValue> newMap = new HashMap<String, PredefinedValue>();
+			JSONObject newMap = new JSONObject();
 			newMap.put(name, value);
 			currentDataMap.add(newMap);
 		} else {
-			HashMap<String, PredefinedValue> nearstMap = currentDataMap.get(currentDataMap.size()-1);
+			JSONObject nearstMap = currentDataMap.get(currentDataMap.size()-1);
 			if(!nearstMap.containsKey(name)) {
 				nearstMap.put(name, value);
 			} else {
-				nearstMap.put(InterpreterRule.info, PredefinedValuesFactory.getValue(infoBuffer, PredefinedValuesType.Info.toString()));
-				infoBuffer = "";
-				HashMap<String, PredefinedValue> newMap = new HashMap<String, PredefinedValue>();
+				pushBufferInfo();
+				JSONObject newMap = new JSONObject();
 				newMap.put(name, value);
 				currentDataMap.add(newMap);
 			}
 		}
-		
+	}
+	private void pushBufferInfo() {
+		if(currentDataMap.size() == 0) {
+			JSONObject newMap = new JSONObject();
+			newMap.put(InterpreterRule.info, infoBuffer);
+			
+			currentDataMap.add(newMap);
+		} else {
+			JSONObject nearstMap = currentDataMap.get(currentDataMap.size()-1);
+			nearstMap.put(InterpreterRule.info, infoBuffer);
+			
+		}
+		infoBuffer = "";
 	}
 	
 	public static void main(String[] args) {
-		SmartInterpreter test = new SmartInterpreter(new File("test/temp/DesmondLim.txt"));
+//		SmartInterpreter test = new SmartInterpreter(new File(Utils.TEST_TEMP_PATH + "DesmondLim.txt"));
+//		SmartInterpreter test = new SmartInterpreter(new File(Utils.TEST_TEMP_PATH + "CV_Yamini_Bhaskar.txt"));
+//		SmartInterpreter test = new SmartInterpreter(new File(Utils.TEST_TEMP_PATH + "CV_Praveen.txt"));
+//		SmartInterpreter test = new SmartInterpreter(new File(Utils.TEST_TEMP_PATH + "DonnabelleEmbodo.txt"));
+		SmartInterpreter test = new SmartInterpreter(new File(Utils.TEST_TEMP_PATH + "RussellOng.txt"));
+		
 		test.build();
 		
 	}

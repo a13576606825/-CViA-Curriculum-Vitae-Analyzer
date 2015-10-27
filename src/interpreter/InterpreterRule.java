@@ -136,6 +136,8 @@ public class InterpreterRule {
 		
 	}
 	public static void main(String[] args) {
-		Utils.debug(isNewCategory("personal details"));
+//		Utils.debug(isNewCategory("personal details"));
+//		Utils.debug(getRuleForCategory(startCategory).getPrimaryKeys());
+		Utils.debug(getRuleForCategory("education").getCategoryEntries().get(1).name);
 	}
 }
