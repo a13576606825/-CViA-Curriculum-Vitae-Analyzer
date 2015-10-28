@@ -22,7 +22,7 @@ import predefinedValues.PredefinedValuesType;
 
 public class SmartInterpreter {
 
-	private static JSONObject exportDataMap;
+	private JSONObject exportDataMap;
 	private String currentCategory;
 	// first string is value name, second is value 
 	private ArrayList<JSONObject> currentDataMap; 
@@ -36,7 +36,7 @@ public class SmartInterpreter {
 		currentDataMap = new ArrayList<JSONObject>();
 	}
 	
-	public void build() {
+	public JSONObject build() {
 		try (BufferedReader br = new BufferedReader(new FileReader(toInterprete))) {
 		    String line;
 		    while ((line = br.readLine()) != null) {
@@ -71,6 +71,7 @@ public class SmartInterpreter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return exportDataMap;
 		
 	}
 
