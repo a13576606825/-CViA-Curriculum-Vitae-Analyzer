@@ -35,6 +35,12 @@ public class InterpreterRule {
 	public final static String Key_PredefinedValuesType = "predefinedValuesType";
 	
 	
+	public static ArrayList<String> getCategoryList() {
+		if(!isInit) {
+			init();
+		} 
+		return categoryList;
+	}
 	public static CategoryRule getRuleForCategory(String category) {
 		if(!isInit) {
 			init();
