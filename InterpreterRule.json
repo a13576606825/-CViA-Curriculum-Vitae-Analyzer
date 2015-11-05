@@ -12,15 +12,15 @@
             "multipleEntry":false,
             "data":[
                 {
-                    "name":"email",
+                    "name":"Email",
                     "predefinedValuesType":"Email"
                 },
                 {
-                    "name":"mobile",
+                    "name":"Number",
                     "predefinedValuesType":"Number"
                 },
                 {
-                    "name":"info",
+                    "name":"Info",
                     "predefinedValuesType":"Info"
                 }
             ]
@@ -39,7 +39,7 @@
             "multipleEntry":false,
             "data":[
                 {
-                    "name":"info",
+                    "name":"Info",
                     "predefinedValuesType":"Info"
                 }
             ]
@@ -58,11 +58,11 @@
             "multipleEntry":true,
             "data":[
                 {
-                    "name":"duration",
+                    "name":"Duration",
                     "predefinedValuesType":"Duration"
                 },
                 {
-                    "name":"info",
+                    "name":"Info",
                     "predefinedValuesType":"Info"
                 }
             ]
@@ -80,15 +80,15 @@
             "multipleEntry":true,
             "data":[
                 {
-                    "name":"gpa",
+                    "name":"GPA",
                     "predefinedValuesType":"GPA"
                 },
                 {
-                    "name":"educationLevel",
+                    "name":"EducationLevel",
                     "predefinedValuesType":"EducationLevel"
                 },
                 {
-                    "name":"info",
+                    "name":"Info",
                     "predefinedValuesType":"Info"
                 }
             ]
@@ -108,7 +108,7 @@
             "multipleEntry":false,
             "data":[
                 {
-                    "name":"info",
+                    "name":"Info",
                     "predefinedValuesType":"Info"
                 }
             ]
@@ -125,7 +125,7 @@
             "multipleEntry":false,
             "data":[
                 {
-                    "name":"info",
+                    "name":"Info",
                     "predefinedValuesType":"Info"
                 }
             ]
@@ -143,11 +143,11 @@
             "multipleEntry":true,
             "data":[
                 {
-                    "name":"info",
+                    "name":"Info",
                     "predefinedValuesType":"Info"
                 },
                 {
-                    "name":"date",
+                    "name":"Date",
                     "predefinedValuesType":"Date"
                 }
             ]
@@ -166,7 +166,7 @@
             "multipleEntry":false,
             "data":[
                 {
-                    "name":"info",
+                    "name":"Info",
                     "predefinedValuesType":"Info"
                 }
             ]
@@ -185,7 +185,7 @@
             "multipleEntry":false,
             "data":[
                 {
-                    "name":"info",
+                    "name":"Info",
                     "predefinedValuesType":"Info"
                 }
             ]
@@ -203,7 +203,7 @@
             "multipleEntry":false,
             "data":[
                 {
-                    "name":"info",
+                    "name":"Info",
                     "predefinedValuesType":"Info"
                 }
             ]
@@ -221,7 +221,7 @@
             "multipleEntry":false,
             "data":[
                 {
-                    "name":"info",
+                    "name":"Info",
                     "predefinedValuesType":"Info"
                 }
             ]
@@ -238,7 +238,7 @@
             "multipleEntry":false,
             "data":[
                 {
-                    "name":"info",
+                    "name":"Info",
                     "predefinedValuesType":"Info"
                 }
             ]
@@ -256,7 +256,7 @@
             "multipleEntry":false,
             "data":[
                 {
-                    "name":"info",
+                    "name":"Info",
                     "predefinedValuesType":"Info"
                 }
             ]

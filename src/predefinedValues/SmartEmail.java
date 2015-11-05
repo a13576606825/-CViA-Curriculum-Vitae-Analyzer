@@ -1,5 +1,7 @@
 package predefinedValues;
 
+import evaluator.Comparator;
+
 
 public class SmartEmail implements PredefinedValue {
 	private String emailString;
@@ -24,9 +26,14 @@ public class SmartEmail implements PredefinedValue {
 		// TODO Auto-generated method stub
 		return emailString;	
 	}
+	public static SmartEmail fromString(String value) {
+		return new SmartEmail(value);
+	}
+	
 	
 	@Override
-	public String[] getPossibleValues() {
-		return levels;
+	public boolean compare(Comparator comparaotr, String toCompare) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

@@ -1,5 +1,7 @@
 package predefinedValues;
 
+import interpreter.Utils;
+
 import java.util.ArrayList;
 
 public enum PredefinedValuesType {
@@ -45,8 +47,27 @@ public enum PredefinedValuesType {
     }
     
     
-    public static ArrayList<String> getTypeValues(PredefinedValuesType type) {
+  
+    
+    public ArrayList<String> getTypeValues( ) {
     	ArrayList<String> output = new ArrayList<String>();
+    	String[] nullArray = {"null"}; 
+    	String[] array;
+    	if(this == Duration) {
+    		array = SmartDuration.getPossibleValues();
+    	} else if (this == GPA) {
+    		array = SmartGPA.getPossibleValues();
+    	} else if(this == EducationLevel) {
+    		array = SmartEducationLevel.getPossibleValues();
+    	} else {
+    		array = nullArray;
+    	}
+    	for(String v: array) {
+    		output.add(v);
+    	}
+    	
     	return output;
     }
+    
+   
 }

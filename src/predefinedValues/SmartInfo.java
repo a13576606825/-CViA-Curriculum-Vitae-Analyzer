@@ -1,5 +1,7 @@
 package predefinedValues;
 
+import evaluator.Comparator;
+
 public class SmartInfo implements PredefinedValue {
 	private String info;
 	
@@ -23,9 +25,17 @@ public class SmartInfo implements PredefinedValue {
 		return info;
 		
 	}
+	
+	public static SmartInfo fromString(String stringValue) {
+		// TODO Auto-generated method stub
+		return new SmartInfo(stringValue);
+		
+	}
+	
+	
 	@Override
-	public String[] getPossibleValues() {
-		String[] returned = {"null"};
-		return returned;
+	public boolean compare(Comparator comparator, String toCompare) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

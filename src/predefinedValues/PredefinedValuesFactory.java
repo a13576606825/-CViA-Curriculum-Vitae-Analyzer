@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 
 
@@ -145,6 +145,27 @@ public class PredefinedValuesFactory {
 			return new SmartDuration(dates.get(0), dates.get(1));
 		}
 		return null;
+	}
+
+	public static PredefinedValue fromString(String stringValue, String type) {
+		if(PredefinedValuesType.doesTypeExist(type)) {
+			if(PredefinedValuesType.Email.equalsName(type)) {
+				return SmartEmail.fromString(stringValue);
+			} else if(PredefinedValuesType.GPA.equalsName(type)) {
+				return SmartGPA.fromString(stringValue);
+			} else if(PredefinedValuesType.Number.equalsName(type)) {
+				
+				return SmartNumber.fromString(stringValue);
+			} else if(PredefinedValuesType.Date.equalsName(type)) {
+				return SmartDate.fromString(stringValue);
+			} else if(PredefinedValuesType.Duration.equalsName(type)) {
+				return SmartDuration.fromString(stringValue);
+			} else if(PredefinedValuesType.EducationLevel.equalsName(type)) {
+				return SmartEducationLevel.fromString(stringValue);
+			} // without info
+		}
+		return null;
+		
 	}
 
 //	public static void main(String[] args) {

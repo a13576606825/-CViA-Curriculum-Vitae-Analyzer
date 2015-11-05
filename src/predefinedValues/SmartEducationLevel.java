@@ -1,11 +1,13 @@
 package predefinedValues;
 
+import evaluator.Comparator;
+
 public class SmartEducationLevel implements PredefinedValue {
 
 	public static final String phd = "Phd";
 	public static final String master = "Master";
 	public static final String bachelor = "Bachelor";
-	String[] levels = {bachelor, master, phd};
+	static String[] levels = {bachelor, master, phd};
 	
 	
 	
@@ -17,8 +19,8 @@ public class SmartEducationLevel implements PredefinedValue {
 	@Override
 	public int compareTo(PredefinedValue o) {
 		// TODO Auto-generated method stub
-		int cur = fromString(toString());
-		int ano = fromString(o.toString());
+		int cur = getEducationLevelRank(toString());
+		int ano = getEducationLevelRank(o.toString());
 		if(cur < ano) {
 			return -1;
 		} else if(cur == ano) {
@@ -39,7 +41,7 @@ public class SmartEducationLevel implements PredefinedValue {
 		return PredefinedValuesType.EducationLevel;
 	}
 
-	private int fromString(String s) {
+	private static int getEducationLevelRank(String s) {
 		for(int i=0; i<levels.length; i++) {
 			if(s.equalsIgnoreCase(levels[i])) {
 				return i+1;
@@ -48,8 +50,26 @@ public class SmartEducationLevel implements PredefinedValue {
 		return 0;
 	}
 	
-	@Override
-	public String[] getPossibleValues() {
+	public static SmartEducationLevel fromString(String value) {
+		if(getEducationLevelRank(value) != 0) {
+			return new SmartEducationLevel(value);
+		}
+		return null;
+	}
+	
+	
+	public static String[] getPossibleValues() {
 		return levels;
+	}
+	
+	@Override
+	public boolean compare(Comparator comparator, String toCompare) {
+		
+		double toCompareDouble = (double)getEducationLevelRank(toCompare);
+		if(toCompareDouble == 0.0) {
+			return false;
+		} 
+		double self = (double)getEducationLevelRank(toString());
+		return comparator.compareTwoDouble(self, toCompareDouble);
 	}
 }

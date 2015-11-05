@@ -6,6 +6,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import evaluator.Comparator;
+
 public class SmartDuration implements PredefinedValue {
 
 	public static final String  DATE_FORMAT_NOW = "yyyy-MM-dd";
@@ -23,17 +25,17 @@ public class SmartDuration implements PredefinedValue {
 	
 	@Override
 	public int compareTo(PredefinedValue o) {
-		long curDuration = fromString(toString());
-		if(o instanceof SmartDate) {
-			long oDuration = fromString(o.toString());
-			if(curDuration < oDuration) {
-				return -1;
-			} else if(curDuration== oDuration) {
-				return 0;
-			} else {
-				return 1;
-			}
-		}
+//		long curDuration = fromString(toString());
+//		if(o instanceof SmartDate) {
+//			long oDuration = fromString(o.toString());
+//			if(curDuration < oDuration) {
+//				return -1;
+//			} else if(curDuration== oDuration) {
+//				return 0;
+//			} else {
+//				return 1;
+//			}
+//		}
 		return 0;
 	}
 
@@ -51,14 +53,25 @@ public class SmartDuration implements PredefinedValue {
 	
 	
 	// return num of days in the duration
-	protected long fromString(String s) {
+	private long getNumOfDays(String s) {
 		try {
-			String[] datesStr = s.split(separator);
+			Date sDate = sdf.parse(startDateString);
+			Date eDate = sdf.parse(endDateString);
+			long diffDays = (eDate.getTime() - sDate.getTime()) / (24 * 60 * 60 * 1000);
+			return diffDays;
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	public static SmartDuration fromString(String value) {
+		try {
+			String[] datesStr = value.split(separator);
 			if(datesStr.length >=2) {
 				Date sDate = sdf.parse(datesStr[0]);
 				Date eDate = sdf.parse(datesStr[1]);
-				long diffDays = (sDate.getTime() - sDate.getTime()) / (24 * 60 * 60 * 1000);
-				return diffDays;
+				return new SmartDuration(sDate, eDate);
 			}
 			
 		} catch (ParseException e) {
@@ -66,13 +79,27 @@ public class SmartDuration implements PredefinedValue {
 			e.printStackTrace();
 			Utils.debug("fail to covert String to SmartDate");
 		}
-		return -1;
+		return null;
 	}
-	@Override
-	public String[] getPossibleValues() {
+	
+	public static String[] getPossibleValues() {
 		String[] returned = {"0.5", "1", "2", "3", "5", "10"};
 		return returned;
 	}
-
+	@Override
+	public boolean compare(Comparator comparator, String toCompare) {
+		try {
+			double toCompareDouble = Double.parseDouble(toCompare);
+			double daysPerYear = 365;
+			double self = getNumOfDays(toString());
+			return comparator.compareTwoDouble(self/daysPerYear, toCompareDouble);
+			
+		} catch(NumberFormatException e) {
+		  
+		}
+		
+		
+		return false;
+	}
 
 }
