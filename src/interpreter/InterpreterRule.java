@@ -122,6 +122,7 @@ public class InterpreterRule {
 		}
 		return false;
 	}
+	
 	private static void extractCategoryList() {
 		
 		Iterator<JSONObject> itr = categoryRules.iterator();

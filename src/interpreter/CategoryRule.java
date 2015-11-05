@@ -53,6 +53,7 @@ public class CategoryRule {
 	public ArrayList<String> getSecondaryKeys() {
 		return secondaryKeys;
 	}
+	
 	public ArrayList<CategoryEntry> getCategoryEntries(){
 		return categoryEntries;
 	}
