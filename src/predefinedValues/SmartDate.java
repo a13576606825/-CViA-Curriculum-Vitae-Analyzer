@@ -4,6 +4,7 @@ import interpreter.Utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class SmartDate implements PredefinedValue {
@@ -53,6 +54,12 @@ public class SmartDate implements PredefinedValue {
 			Utils.debug("fail to covert String to SmartDate");
 		}
 		return null;
+	}
+
+	@Override
+	public String[] getPossibleValues() {
+		String[] returned = {"null"};
+		return returned;
 	}
 
 

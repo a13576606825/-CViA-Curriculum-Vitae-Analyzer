@@ -23,5 +23,9 @@ public class SmartInfo implements PredefinedValue {
 		return info;
 		
 	}
-
+	@Override
+	public String[] getPossibleValues() {
+		String[] returned = {"null"};
+		return returned;
+	}
 }

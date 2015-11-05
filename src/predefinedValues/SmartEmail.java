@@ -22,7 +22,11 @@ public class SmartEmail implements PredefinedValue {
 	}
 	public String toString() {
 		// TODO Auto-generated method stub
-		return emailString;
-		
+		return emailString;	
+	}
+	
+	@Override
+	public String[] getPossibleValues() {
+		return levels;
 	}
 }

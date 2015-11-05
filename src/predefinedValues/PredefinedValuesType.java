@@ -1,5 +1,7 @@
 package predefinedValues;
 
+import java.util.ArrayList;
+
 public enum PredefinedValuesType {
     Number ("Number"),
     Email ("Email"),
@@ -32,4 +34,19 @@ public enum PredefinedValuesType {
 		}
 		return false;
 	}
+    
+    public static PredefinedValuesType fromString(String typeName) {
+    	for(PredefinedValuesType type: PredefinedValuesType.values()) {
+			if(type.equalsName(typeName) && type != InvalidType) {
+				return type;
+			}
+		}
+		return null;
+    }
+    
+    
+    public static ArrayList<String> getTypeValues(PredefinedValuesType type) {
+    	ArrayList<String> output = new ArrayList<String>();
+    	return output;
+    }
 }

@@ -68,6 +68,11 @@ public class SmartDuration implements PredefinedValue {
 		}
 		return -1;
 	}
+	@Override
+	public String[] getPossibleValues() {
+		String[] returned = {"0.5", "1", "2", "3", "5", "10"};
+		return returned;
+	}
 
 
 }

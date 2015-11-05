@@ -23,4 +23,10 @@ public class SmartNumber implements PredefinedValue {
 		return numString;
 		
 	}
+	
+	@Override
+	public String[] getPossibleValues() {
+		String[] returned = {"null"};
+		return returned;
+	}
 }

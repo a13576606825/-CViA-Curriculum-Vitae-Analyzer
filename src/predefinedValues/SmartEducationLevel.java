@@ -47,4 +47,9 @@ public class SmartEducationLevel implements PredefinedValue {
 		}
 		return 0;
 	}
+	
+	@Override
+	public String[] getPossibleValues() {
+		return levels;
+	}
 }

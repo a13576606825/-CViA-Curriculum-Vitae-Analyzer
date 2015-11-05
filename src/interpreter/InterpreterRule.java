@@ -1,5 +1,7 @@
 package interpreter;
 
+import interpreter.CategoryRule.CategoryEntry;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -12,6 +14,8 @@ import java.util.Iterator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
+import predefinedValues.PredefinedValuesType;
 
 
 public class InterpreterRule {
@@ -34,12 +38,22 @@ public class InterpreterRule {
 	public final static String Key_HasPredefinedValues = "hasPredefinedValues";
 	public final static String Key_PredefinedValuesType = "predefinedValuesType";
 	
-	
+	// step 1 
 	public static ArrayList<String> getCategoryList() {
 		if(!isInit) {
 			init();
 		} 
 		return categoryList;
+	}
+	// step 2
+	public static ArrayList<String> getPredefinedValuesTypesByCategory(String category) {
+		ArrayList<String> output = new ArrayList<String>();
+		CategoryRule categoryRule  = getRuleForCategory(category);
+		for(CategoryEntry entry: categoryRule.getCategoryEntries()) {
+			output.add(entry.type);
+		}
+		return output;
+		
 	}
 	public static CategoryRule getRuleForCategory(String category) {
 		if(!isInit) {
