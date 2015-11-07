@@ -45,16 +45,18 @@ public class MainViewController extends VBox {
 	
 	private static final String IMPORT_SINGLE_BUTTON_TEXT = "Add a CV";
 	private static final String IMPORT_MULTIPLE_BUTTON_TEXT = "Add CVs";
-	private static final String SETTING_BUTTON_TEXT = "Add Filter";
+	private static final String FILTER_BUTTON_TEXT = "Add Filter";
 	private static final String PROCESS_BUTTON_TEXT = "Analyse";
 	private static final String EXPORT_BUTTON_TEXT = "Export";
 	
-	private static final double TABLE_WIDTH = 280;
-	private static final double TABLE_HEIGHT = 300;
 	private static final double BUTTON_WIDTH = 130;
 	private static final double BUTTON_HEIGHT = 30;
 	
-	private static final double RESULT_TABLE_WIDTH = 700;
+	private static final double FILE_TABLE_WIDTH = 250;
+	private static final double FILE_TABLE_HEIGHT = 300;
+	private static final double FILTER_TABLE_WIDTH = 850;
+	private static final double FILTER_TABLE_HEIGHT = 300;
+	private static final double RESULT_TABLE_WIDTH = 1200;
 	private static final double RESULT_TABLE_HEIGHT = 330;
 	
 	private static final double PADDING_SIZE = 20;
@@ -62,11 +64,11 @@ public class MainViewController extends VBox {
 //	private static final double MAX_SCORE = 100;
 	private static final String EXPORT_FILE_NAME = "result";
 	
-	private static final String[] FILE_TABLE_COLUMN = {"Type", "Filename"};
-	private static final String[] FILE_TABLE_COLUMN_PROPERTY = {"type", "filename"};
+	private static final String[] FILE_TABLE_COLUMN = {"Filename", "Type"};
+	private static final String[] FILE_TABLE_COLUMN_PROPERTY = {"filename", "type"};
 	
-	private static final String[] SETTING_TABLE_COLUMN = {"Attribute", "Constraint"};
-	private static final String[] SETTING_TABLE_COLUMN_PROPERTY = {"attribute", "constraint"};
+	private static final String[] FILTER_TABLE_COLUMN = {"Category", "Type", "Key", "Comparator", "Value", "Priority"};
+	private static final String[] FILTER_TABLE_COLUMN_PROPERTY = {"category", "type", "key", "comparator", "value", "priority"};
 	
 	private static final String[] RESULT_TABLE_COLUMN = {"Filename", "Score"};
 	private static final String[] RESULT_TABLE_COLUMN_PROPERTY = {"filename", "score"};
@@ -95,7 +97,7 @@ public class MainViewController extends VBox {
 	
 	private Button importSingleButton;
 	private Button importMultipleButton;
-	private Button settingButton;
+	private Button filterButton;
 	private Button processButton;
 	private Button exportButton;
 	
@@ -105,7 +107,7 @@ public class MainViewController extends VBox {
 	private VBox resultBox;
 	
 	private TableView<FileObject> fileTable;
-	private TableView<Filter> settingTable;
+	private TableView<Filter> filterTable;
 	private TableView<EvaluatedRecord> resultTable;
 	
 	private ArrayList<File> originalFileList;
@@ -142,29 +144,29 @@ public class MainViewController extends VBox {
 		this.stageHeight = stageHeight;
 		
 		this.widthBetweenButton = (this.stageWidth - MainViewController.BUTTON_WIDTH*5)/6;
-		this.widthBetweenTable = (this.stageWidth - MainViewController.TABLE_WIDTH*2)/3;
+		this.widthBetweenTable = (this.stageWidth - MainViewController.FILE_TABLE_WIDTH - MainViewController.FILTER_TABLE_WIDTH)/3;
 	}
 	
 	private void initializeMainView() {
 		importSingleButton = new Button(IMPORT_SINGLE_BUTTON_TEXT);
 		importMultipleButton = new Button(IMPORT_MULTIPLE_BUTTON_TEXT);
-		settingButton = new Button(SETTING_BUTTON_TEXT);
+		filterButton = new Button(FILTER_BUTTON_TEXT);
 		processButton = new Button(PROCESS_BUTTON_TEXT);
 		exportButton = new Button(EXPORT_BUTTON_TEXT);
 		
 		buttonBox = new HBox();
-		buttonBox.getChildren().addAll(importSingleButton, importMultipleButton, settingButton, processButton, exportButton);
+		buttonBox.getChildren().addAll(importSingleButton, importMultipleButton, filterButton, processButton, exportButton);
 		
 		fileTable = new TableView<FileObject>();
 		initializeFileTableView(fileTable, FILE_TABLE_COLUMN, FILE_TABLE_COLUMN_PROPERTY);
 		fileTable.setItems(fileData);
 		
-		settingTable = new TableView<Filter>();
-		initializeSettingTableView(settingTable, SETTING_TABLE_COLUMN, SETTING_TABLE_COLUMN_PROPERTY);
-		settingTable.setItems(filterData);
+		filterTable = new TableView<Filter>();
+		initializeFilterTableView(filterTable, FILTER_TABLE_COLUMN, FILTER_TABLE_COLUMN_PROPERTY);
+		filterTable.setItems(filterData);
 		
 		preprocessBox = new HBox();
-		preprocessBox.getChildren().addAll(fileTable, settingTable);
+		preprocessBox.getChildren().addAll(fileTable, filterTable);
 		
 		resultTable = new TableView<EvaluatedRecord>();
 		initializeResultTableView(resultTable, RESULT_TABLE_COLUMN, RESULT_TABLE_COLUMN_PROPERTY);
@@ -217,7 +219,7 @@ public class MainViewController extends VBox {
 		//table.setEditable(true);
 	}
 	
-	private void initializeSettingTableView(TableView<Filter> table, String[] columns, String[] columnProperties) {
+	private void initializeFilterTableView(TableView<Filter> table, String[] columns, String[] columnProperties) {
 		for (int i=0; i<columns.length; i++) {
 			int currentIndex = i;
 			TableColumn<Filter, String> tableColumn = new TableColumn<Filter, String>(columns[i]);
@@ -241,7 +243,7 @@ public class MainViewController extends VBox {
 			tableColumn.setCellValueFactory(new PropertyValueFactory<Filter, String>(columnProperties[i]));
 			table.getColumns().add(tableColumn);
 		}
-		addDeleteButtonToSettingTable();
+		addDeleteButtonToFilterTable();
 		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		table.setEditable(true);
 	}
@@ -302,9 +304,9 @@ public class MainViewController extends VBox {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void addDeleteButtonToSettingTable() {
+	private void addDeleteButtonToFilterTable() {
 		TableColumn deleteColumn = new TableColumn<>("Action");
-		settingTable.getColumns().add(deleteColumn);
+		filterTable.getColumns().add(deleteColumn);
 		
 		deleteColumn.setCellValueFactory(
                 new Callback<TableColumn.CellDataFeatures<Record, Boolean>, 
@@ -321,7 +323,7 @@ public class MainViewController extends VBox {
 
             @Override
             public TableCell<Record, Boolean> call(TableColumn<Record, Boolean> p) {
-                return new SettingTableButtonCell();
+                return new FilterTableButtonCell();
             }
         
         });
@@ -329,17 +331,17 @@ public class MainViewController extends VBox {
 	
 	private void initializePreprocessBox() {
 		HBox.setMargin(fileTable, new Insets(PADDING_SIZE, widthBetweenTable/2, PADDING_SIZE, widthBetweenTable));
-		HBox.setMargin(settingTable, new Insets(PADDING_SIZE, widthBetweenTable, PADDING_SIZE, widthBetweenTable/2));
-		fileTable.setMaxSize(TABLE_WIDTH, TABLE_HEIGHT);
-		fileTable.setMinSize(TABLE_WIDTH, TABLE_HEIGHT);
-		settingTable.setMaxSize(TABLE_WIDTH, TABLE_HEIGHT);
-		settingTable.setMinSize(TABLE_WIDTH, TABLE_HEIGHT);
+		HBox.setMargin(filterTable, new Insets(PADDING_SIZE, widthBetweenTable, PADDING_SIZE, widthBetweenTable/2));
+		fileTable.setMaxSize(FILE_TABLE_WIDTH, FILE_TABLE_HEIGHT);
+		fileTable.setMinSize(FILE_TABLE_WIDTH, FILE_TABLE_HEIGHT);
+		filterTable.setMaxSize(FILTER_TABLE_WIDTH, FILTER_TABLE_HEIGHT);
+		filterTable.setMinSize(FILTER_TABLE_WIDTH, FILTER_TABLE_HEIGHT);
 	}
 	
 	private void initializeButtonBox() {
 		HBox.setMargin(importSingleButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton));
 		HBox.setMargin(importMultipleButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton/2));
-		HBox.setMargin(settingButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton/2));
+		HBox.setMargin(filterButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton/2));
 		HBox.setMargin(processButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton/2));
 		HBox.setMargin(exportButton, new Insets(PADDING_SIZE, widthBetweenButton, PADDING_SIZE, widthBetweenButton/2));
 		
@@ -347,8 +349,8 @@ public class MainViewController extends VBox {
 		importSingleButton.setMinSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 		importMultipleButton.setMaxSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 		importMultipleButton.setMinSize(BUTTON_WIDTH, BUTTON_HEIGHT);
-		settingButton.setMaxSize(BUTTON_WIDTH, BUTTON_HEIGHT);
-		settingButton.setMinSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+		filterButton.setMaxSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+		filterButton.setMinSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 		processButton.setMaxSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 		processButton.setMinSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 		exportButton.setMaxSize(BUTTON_WIDTH, BUTTON_HEIGHT);
@@ -404,7 +406,7 @@ public class MainViewController extends VBox {
 			}
 		});
 		
-		settingButton.setOnAction(new EventHandler<ActionEvent>() {
+		filterButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				filterData.add(new Filter("", ""));
@@ -474,7 +476,7 @@ public class MainViewController extends VBox {
 	}
 	
 	private void setFilterList() {
-		for (Filter filter : settingTable.getItems()) {
+		for (Filter filter : filterTable.getItems()) {
 			System.out.println(filter.getConstraint());
 			filterList.add(filter.getConstraint());
 		}
@@ -619,10 +621,10 @@ public class MainViewController extends VBox {
         }
     }
 	
-	public class SettingTableButtonCell extends TableCell<Record, Boolean> {
+	public class FilterTableButtonCell extends TableCell<Record, Boolean> {
         final Button cellButton = new Button("X");
         
-        SettingTableButtonCell () {
+        FilterTableButtonCell () {
             
         	//Action when the button is pressed
             cellButton.setOnAction(new EventHandler<ActionEvent>(){
@@ -630,7 +632,7 @@ public class MainViewController extends VBox {
                 @Override
                 public void handle(ActionEvent t) {
                     // get Selected Item
-                	Filter currentFilter = (Filter) SettingTableButtonCell.this.getTableView().getItems().get(SettingTableButtonCell.this.getIndex());
+                	Filter currentFilter = (Filter) FilterTableButtonCell.this.getTableView().getItems().get(FilterTableButtonCell.this.getIndex());
                 	//remove selected item from the table list
                 	filterData.remove(currentFilter);
                 }

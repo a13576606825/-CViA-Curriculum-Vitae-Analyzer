@@ -6,7 +6,7 @@ import javafx.stage.Stage;
  
 public class MainView extends Application {
 	
-	private static final double STAGE_WIDTH = 700;
+	private static final double STAGE_WIDTH = 1200;
 	private static final double STAGE_HEIGHT = 900;
     
     public static void main(String[] args) {
