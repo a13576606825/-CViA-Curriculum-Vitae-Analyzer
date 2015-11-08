@@ -3,7 +3,8 @@ package evaluator;
 public enum Priority {
 	High ("high"),
 	Medium ("medium"),
-	Low ("low");
+	Low ("low"),
+	Empty ("");
 	
 	private final String priority;
 	

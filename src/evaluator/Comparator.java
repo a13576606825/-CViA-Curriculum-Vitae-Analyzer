@@ -6,7 +6,8 @@ public enum Comparator {
 	Equal ("="),
 	LargerOrEqual (">="),
 	SmallerOrEqual ("<="),
-	NotEqual ("!=");
+	NotEqual ("!="),
+	Empty ("");
 	
 	private final String comparator;
 	

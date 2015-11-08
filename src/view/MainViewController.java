@@ -8,8 +8,13 @@ import java.util.ArrayList;
 
 import com.sun.prism.impl.Disposer.Record;
 
+import evaluator.Comparator;
+import evaluator.Priority;
+import interpreter.InterpreterRule;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,12 +22,15 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -31,6 +39,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import logic.Interpreter;
 import parser.CVReader;
+import predefinedValues.PredefinedValuesType;
 
 @SuppressWarnings("restriction")
 public class MainViewController extends VBox {
@@ -42,6 +51,10 @@ public class MainViewController extends VBox {
 	private static final String TXT = "txt";
 	private static final String XLS = "xls";
 	private static final String XML = "xml";
+	
+	private static final String ICON_PATH = "icon.png";
+	private static final double ICON_WIDTH = 50;
+	private static final double ICON_HEIGHT = 50;
 	
 	private static final String IMPORT_SINGLE_BUTTON_TEXT = "Add a CV";
 	private static final String IMPORT_MULTIPLE_BUTTON_TEXT = "Add CVs";
@@ -61,7 +74,6 @@ public class MainViewController extends VBox {
 	
 	private static final double PADDING_SIZE = 20;
 	
-//	private static final double MAX_SCORE = 100;
 	private static final String EXPORT_FILE_NAME = "result";
 	
 	private static final String[] FILE_TABLE_COLUMN = {"Filename", "Type"};
@@ -73,18 +85,8 @@ public class MainViewController extends VBox {
 	private static final String[] RESULT_TABLE_COLUMN = {"Filename", "Score"};
 	private static final String[] RESULT_TABLE_COLUMN_PROPERTY = {"filename", "score"};
 	
-	private ObservableList<FileObject> fileData = FXCollections.observableArrayList(
-//				new FileObject("pdf", "1.pdf"),
-//				new FileObject("txt", "2.txt"),
-//				new FileObject("xls", "3.xls"),
-//				new FileObject("doc", "4.doc")
-			);
-	private ObservableList<Filter> filterData = FXCollections.observableArrayList(
-//				new Filter("Skill", "Java"),
-//				new Filter("Major", "Computer Science"),
-//				new Filter("Skill", "Software Engineer"),
-//				new Filter("Skill", "Android")
-			);
+	private ObservableList<FileObject> fileData = FXCollections.observableArrayList();
+	private ObservableList<Filter> filterData = FXCollections.observableArrayList();
 	
 	private ObservableList<EvaluatedRecord> resultData = FXCollections.observableArrayList();
 	
@@ -94,6 +96,9 @@ public class MainViewController extends VBox {
 	
 	private double widthBetweenTable;
 	private double widthBetweenButton;
+	
+	private ImageView iconImageView;
+	private Image iconImage;
 	
 	private Button importSingleButton;
 	private Button importMultipleButton;
@@ -114,11 +119,22 @@ public class MainViewController extends VBox {
 	private ArrayList<File> textFileList;
 	private ArrayList<String> textFilePathList;
 	
+	private ArrayList<String> categoryList;
+	
+	private Callback<TableColumn<Filter, String>, TableCell<Filter, String>> categoryComboBoxCellFactory;
+	private Callback<TableColumn<Filter, String>, TableCell<Filter, String>> typeComboBoxCellFactory;
+	private Callback<TableColumn<Filter, String>, TableCell<Filter, String>> keyEditingCellFactory; // different from others
+	private Callback<TableColumn<Filter, String>, TableCell<Filter, String>> comparatorComboBoxCellFactory;
+	private Callback<TableColumn<Filter, String>, TableCell<Filter, String>> valueComboBoxCellFactory;
+	private Callback<TableColumn<Filter, String>, TableCell<Filter, String>> priorityComboBoxCellFactory;
+	
+	
 	private ArrayList<String> filterList;
 	
 	private ArrayList<Integer> scoreList;
 	
 	public MainViewController(double stageWidth, double stageHeight) {
+		initializeCellFactory();
 		initializeList();
 		initializeStageSize(stageWidth, stageHeight);
 		initializeMainView();
@@ -129,6 +145,15 @@ public class MainViewController extends VBox {
 		initializeButtonEventHandler();
 	}
 	
+	private void initializeCellFactory() {
+		categoryComboBoxCellFactory = (TableColumn<Filter, String> param) -> new CategoryComboBoxCell();
+		typeComboBoxCellFactory = (TableColumn<Filter, String> param) -> new TypeComboBoxCell();
+		keyEditingCellFactory = TextFieldTableCell.forTableColumn();
+		comparatorComboBoxCellFactory = (TableColumn<Filter, String> param) -> new ComparatorComboBoxCell();
+		valueComboBoxCellFactory = (TableColumn<Filter, String> param) -> new ValueComboBoxCell();
+		priorityComboBoxCellFactory = (TableColumn<Filter, String> param) -> new PriorityComboBoxCell();
+	}
+	
 	private void initializeList() {
 		originalFileList = new ArrayList<File>();
 		textFileList = new ArrayList<File>();
@@ -137,6 +162,8 @@ public class MainViewController extends VBox {
 		filterList = new ArrayList<String>();
 		
 		scoreList = new ArrayList<Integer>();
+		
+		categoryList = InterpreterRule.getCategoryList();
 	}
 	
 	private void initializeStageSize(double stageWidth, double stageHeight) {
@@ -148,6 +175,9 @@ public class MainViewController extends VBox {
 	}
 	
 	private void initializeMainView() {
+		iconImageView = new ImageView();
+        iconImage = new Image(MainView.class.getResourceAsStream(ICON_PATH));
+		
 		importSingleButton = new Button(IMPORT_SINGLE_BUTTON_TEXT);
 		importMultipleButton = new Button(IMPORT_MULTIPLE_BUTTON_TEXT);
 		filterButton = new Button(FILTER_BUTTON_TEXT);
@@ -155,7 +185,7 @@ public class MainViewController extends VBox {
 		exportButton = new Button(EXPORT_BUTTON_TEXT);
 		
 		buttonBox = new HBox();
-		buttonBox.getChildren().addAll(importSingleButton, importMultipleButton, filterButton, processButton, exportButton);
+		buttonBox.getChildren().addAll(iconImageView, importSingleButton, importMultipleButton, filterButton, processButton, exportButton);
 		
 		fileTable = new TableView<FileObject>();
 		initializeFileTableView(fileTable, FILE_TABLE_COLUMN, FILE_TABLE_COLUMN_PROPERTY);
@@ -169,7 +199,7 @@ public class MainViewController extends VBox {
 		preprocessBox.getChildren().addAll(fileTable, filterTable);
 		
 		resultTable = new TableView<EvaluatedRecord>();
-		initializeResultTableView(resultTable, RESULT_TABLE_COLUMN, RESULT_TABLE_COLUMN_PROPERTY);
+//		initializeResultTableView(resultTable, RESULT_TABLE_COLUMN, RESULT_TABLE_COLUMN_PROPERTY);
 		resultTable.setItems(resultData);
 		
 		resultBox = new VBox();
@@ -190,58 +220,87 @@ public class MainViewController extends VBox {
 	
 	private void initializeFileTableView(TableView<FileObject> table, String[] columns, String[] columnProperties) {
 		for (int i=0; i<columns.length; i++) {
-			int currentIndex = i;
 			TableColumn<FileObject, String> tableColumn = new TableColumn<FileObject, String>(columns[i]);
 			tableColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-			tableColumn.setOnEditCommit(new EventHandler<CellEditEvent<FileObject, String>>() {
-				@Override
-				public void handle(CellEditEvent<FileObject, String> event) {
-					FileObject file = (FileObject) event.getTableView().getItems().get(event.getTablePosition().getRow());
-					switch (currentIndex) {
-						case 0:
-							file.setType(event.getNewValue());
-							break;
-						case 1:
-							file.setFilename(event.getNewValue());
-							break;
-						default:
-							break;
-					}
-				}	
-			});
 			tableColumn.setCellValueFactory(new PropertyValueFactory<FileObject, String>(columnProperties[i]));
 			table.getColumns().add(tableColumn);
 		}
 		addDeleteButtonToFileTable();
 		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-		
-		// User should not modify the file attributes except deletion
-		//table.setEditable(true);
+
 	}
 	
 	private void initializeFilterTableView(TableView<Filter> table, String[] columns, String[] columnProperties) {
 		for (int i=0; i<columns.length; i++) {
-			int currentIndex = i;
 			TableColumn<Filter, String> tableColumn = new TableColumn<Filter, String>(columns[i]);
-			tableColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-			tableColumn.setOnEditCommit(new EventHandler<CellEditEvent<Filter, String>>() {
-				@Override
-				public void handle(CellEditEvent<Filter, String> event) {
-					Filter file = (Filter) event.getTableView().getItems().get(event.getTablePosition().getRow());
-					switch (currentIndex) {
-						case 0:
-							file.setAttribute(event.getNewValue());
-							break;
-						case 1:
-							file.setConstraint(event.getNewValue());
-							break;
-						default:
-							break;
-					}
-				}	
-			});
-			tableColumn.setCellValueFactory(new PropertyValueFactory<Filter, String>(columnProperties[i]));
-			table.getColumns().add(tableColumn);
+			switch (i) {
+				// Category
+				case 0:
+					tableColumn.setCellFactory(this.categoryComboBoxCellFactory);
+					tableColumn.setOnEditCommit(new EventHandler<CellEditEvent<Filter, String>>() {
+						@Override
+						public void handle(CellEditEvent<Filter, String> event) {
+							Filter filter = (Filter) event.getTableView().getItems().get(event.getTablePosition().getRow());
+							filter.setCategory(event.getNewValue());
+						}
+					});
+					tableColumn.setCellValueFactory(new PropertyValueFactory<Filter, String>(columnProperties[i]));
+					table.getColumns().add(tableColumn);
+					break;
+					
+				// Type
+				case 1:
+					tableColumn.setCellFactory(this.typeComboBoxCellFactory);
+					tableColumn.setOnEditCommit(new EventHandler<CellEditEvent<Filter, String>>() {
+						@Override
+						public void handle(CellEditEvent<Filter, String> event) {
+							System.out.println("edit");
+							Filter filter = (Filter) event.getTableView().getItems().get(event.getTablePosition().getRow());
+							filter.setCategory(event.getNewValue());
+						}
+					});
+					tableColumn.setCellValueFactory(new PropertyValueFactory<Filter, String>(columnProperties[i]));
+					table.getColumns().add(tableColumn);
+					break;
+					
+				// Key
+				case 2:
+					tableColumn.setCellFactory(keyEditingCellFactory);
+					tableColumn.setOnEditCommit(new EventHandler<CellEditEvent<Filter, String>>() {
+						@Override
+						public void handle(CellEditEvent<Filter, String> event) {
+							Filter filter = (Filter) event.getTableView().getItems().get(event.getTablePosition().getRow());
+							filter.setKey(event.getNewValue());
+						}
+					});
+					tableColumn.setCellValueFactory(new PropertyValueFactory<Filter, String>(columnProperties[i]));
+					table.getColumns().add(tableColumn);
+					break;
+					
+				// Comparator
+				case 3:
+					tableColumn.setCellFactory(this.comparatorComboBoxCellFactory);
+					tableColumn.setCellValueFactory(new PropertyValueFactory<Filter, String>(columnProperties[i]));
+					table.getColumns().add(tableColumn);
+					break;
+					
+				// Value
+				case 4:
+					tableColumn.setCellFactory(this.valueComboBoxCellFactory);
+					tableColumn.setCellValueFactory(new PropertyValueFactory<Filter, String>(columnProperties[i]));
+					table.getColumns().add(tableColumn);
+					break;
+					
+				// Priority
+				case 5:
+					tableColumn.setCellFactory(this.priorityComboBoxCellFactory);
+					tableColumn.setCellValueFactory(new PropertyValueFactory<Filter, String>(columnProperties[i]));
+					table.getColumns().add(tableColumn);
+					break;
+					
+				default:
+					break;
+			}
 		}
 		addDeleteButtonToFilterTable();
 		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -279,7 +338,7 @@ public class MainViewController extends VBox {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void addDeleteButtonToFileTable() {
-		TableColumn deleteColumn = new TableColumn<>("Action");
+		TableColumn deleteColumn = new TableColumn<>("Actions");
 		fileTable.getColumns().add(deleteColumn);
 		
 		deleteColumn.setCellValueFactory(
@@ -305,7 +364,7 @@ public class MainViewController extends VBox {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void addDeleteButtonToFilterTable() {
-		TableColumn deleteColumn = new TableColumn<>("Action");
+		TableColumn deleteColumn = new TableColumn<>("Actions");
 		filterTable.getColumns().add(deleteColumn);
 		
 		deleteColumn.setCellValueFactory(
@@ -339,11 +398,16 @@ public class MainViewController extends VBox {
 	}
 	
 	private void initializeButtonBox() {
-		HBox.setMargin(importSingleButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton));
-		HBox.setMargin(importMultipleButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton/2));
-		HBox.setMargin(filterButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton/2));
-		HBox.setMargin(processButton, new Insets(PADDING_SIZE, widthBetweenButton/2, PADDING_SIZE, widthBetweenButton/2));
-		HBox.setMargin(exportButton, new Insets(PADDING_SIZE, widthBetweenButton, PADDING_SIZE, widthBetweenButton/2));
+		HBox.setMargin(iconImageView, new Insets(PADDING_SIZE/2, 0, PADDING_SIZE/2, widthBetweenButton/4));
+		iconImageView.setFitHeight(ICON_HEIGHT);
+		iconImageView.setFitWidth(ICON_WIDTH);
+		iconImageView.setImage(iconImage);
+		
+		HBox.setMargin(importSingleButton, new Insets(PADDING_SIZE, widthBetweenButton/3, PADDING_SIZE, widthBetweenButton*2));
+		HBox.setMargin(importMultipleButton, new Insets(PADDING_SIZE, widthBetweenButton/3, PADDING_SIZE, widthBetweenButton/3));
+		HBox.setMargin(filterButton, new Insets(PADDING_SIZE, widthBetweenButton/3, PADDING_SIZE, widthBetweenButton/3));
+		HBox.setMargin(processButton, new Insets(PADDING_SIZE, widthBetweenButton/3, PADDING_SIZE, widthBetweenButton/3));
+		HBox.setMargin(exportButton, new Insets(PADDING_SIZE, widthBetweenButton, PADDING_SIZE, widthBetweenButton/3));
 		
 		importSingleButton.setMaxSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 		importSingleButton.setMinSize(BUTTON_WIDTH, BUTTON_HEIGHT);
@@ -409,7 +473,10 @@ public class MainViewController extends VBox {
 		filterButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				filterData.add(new Filter("", ""));
+				for (Filter f : filterData) {
+					System.out.println(f.getCategory() + ", " + f.getType() + ", " + f.getKey() + ", " + f.getComparator() + ", " + f.getValue() + ", " + f.getPriority());
+				}
+				filterData.add(new Filter("", "", "", "", "", ""));
 			}
 		});
 		
@@ -476,10 +543,7 @@ public class MainViewController extends VBox {
 	}
 	
 	private void setFilterList() {
-		for (Filter filter : filterTable.getItems()) {
-			System.out.println(filter.getConstraint());
-			filterList.add(filter.getConstraint());
-		}
+		
 	}
 	
 	private boolean isCVFileType(String type) {
@@ -540,28 +604,101 @@ public class MainViewController extends VBox {
 	}
 	
 	public static class Filter {
-		private final SimpleStringProperty attribute;
-		private final SimpleStringProperty constraint;
+		private final SimpleStringProperty category;
+		private final SimpleStringProperty type;
+		private final SimpleStringProperty key;
+		private final SimpleStringProperty comparator;
+		private final SimpleStringProperty value;
+		private final SimpleStringProperty priority;
 		
-		public Filter(String attribute, String constraint) {
-			this.attribute = new SimpleStringProperty(attribute);
-			this.constraint = new SimpleStringProperty(constraint);
+		public Filter() {
+			this.category = new SimpleStringProperty("");
+			this.type = new SimpleStringProperty("");
+			this.key = new SimpleStringProperty("");
+			this.comparator = new SimpleStringProperty("");
+			this.value = new SimpleStringProperty("");
+			this.priority = new SimpleStringProperty("");
 		}
 		
-		public String getAttribute() {
-			return attribute.get();
+		public Filter(String category, String type, String key, String comparator, String value, String priority) {
+			this.category = new SimpleStringProperty(category);
+			this.type = new SimpleStringProperty(type);
+			this.key = new SimpleStringProperty(key);
+			this.comparator = new SimpleStringProperty(comparator);
+			this.value = new SimpleStringProperty(value);
+			this.priority = new SimpleStringProperty(priority);
 		}
 		
-		public void setAttribute(String attribute) {
-			this.attribute.set(attribute);
+		public String getCategory() {
+			return category.get();
 		}
 		
-		public String getConstraint() {
-			return constraint.get();
+		public String getType() {
+			return type.get();
 		}
 		
-		public void setConstraint(String constraint) {
-			this.constraint.set(constraint);
+		public String getKey() {
+			return key.get();
+		}
+		
+		public String getComparator() {
+			return comparator.get();
+		}
+		
+		public String getValue() {
+			return value.get();
+		}
+		
+		public String getPriority() {
+			return priority.get();
+		}
+		
+		public void setCategory(String category) {
+			this.category.set(category);
+		}
+		
+		public void setType(String type) {
+			this.type.set(type);
+		}
+		
+		public void setKey(String key) {
+			this.key.set(key);
+		}
+		
+		public void setComparator(String comparator) {
+			this.comparator.set(comparator);
+		}
+		
+		public void setValue(String value) {
+			this.value.set(value);
+		}
+		
+		public void setPriority(String priority) {
+			this.priority.set(priority);
+		}
+		
+		public StringProperty categoryProperty() {
+			return category;
+		}
+		
+		public StringProperty typeProperty() {
+			return type;
+		}
+		
+		public StringProperty keyProperty() {
+			return key;
+		}
+		
+		public StringProperty comparatorProperty() {
+			return comparator;
+		}
+		
+		public StringProperty valueProperty() {
+			return value;
+		}
+		
+		public StringProperty priorityProperty() {
+			return priority;
 		}
 	}
 	
@@ -589,6 +726,384 @@ public class MainViewController extends VBox {
 		public void setScore(String score) {
 			this.score.set(score);
 		}
+	}
+	
+	public class CategoryComboBoxCell extends TableCell<Filter, String> {
+		private ComboBox<String> comboBox;
+		private ArrayList<String> options;
+
+        private CategoryComboBoxCell() {
+        	this.options = categoryList;
+        }
+
+        @Override
+        public void startEdit() {
+            if (!isEmpty()) {
+                super.startEdit();
+                createComboBox();
+                comboBox.setValue(getText());
+                setText(null);
+                setGraphic(comboBox);
+            } else {
+            	super.startEdit();
+            	createComboBox();
+            	comboBox.setValue(null);
+            	setText(null);
+            	setGraphic(comboBox);
+            }
+        }
+
+        @Override
+        public void cancelEdit() {
+            super.cancelEdit();
+
+            setText(comboBox.getValue());
+            setGraphic(null);
+        }
+
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else {
+            	if (comboBox == null) {
+            		createComboBox();
+            	}
+            	comboBox.setValue(item);
+            	setText(null);
+            	setGraphic(comboBox);
+            }
+        }
+
+        private void createComboBox() {
+            comboBox = new ComboBox<String>();
+            comboBox.getItems().addAll(options);
+
+            comboBox.setPromptText("");
+            comboBox.setEditable(false);
+            comboBox.valueProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+					commitEdit(comboBox.getSelectionModel().getSelectedItem());
+					
+					if (newValue != "") {
+						((Filter) getTableView().getItems().get(getTableRow().getIndex())).setCategory(comboBox.getValue());
+						((Filter) getTableView().getItems().get(getTableRow().getIndex())).setType(" ");
+					}
+					
+				}
+                 
+            });
+//            
+//            comboBox.setOnAction((e) -> {
+//                //System.out.println("Committed: " + comboBox.getSelectionModel().getSelectedItem());
+//            	System.out.println("haha");
+//            	getTableView().edit(getIndex(), getTableColumn());
+//                commitEdit(comboBox.getSelectionModel().getSelectedItem());
+//            });
+        }
+	}
+	
+	public class TypeComboBoxCell extends TableCell<Filter, String> {
+		private ComboBox<String> comboBox;
+		private String category;
+		private ArrayList<String> options;
+
+        private TypeComboBoxCell() {
+        	this.options = new ArrayList<String>();
+        }
+        
+        public void setCategory(String category) {
+        	this.category = category;
+        	this.options = InterpreterRule.getPredefinedValuesTypesByCategory(this.category);
+        	createComboBox();
+        }
+
+        @Override
+        public void startEdit() {
+            if (!isEmpty()) {
+                super.startEdit();
+                createComboBox();
+                comboBox.setValue(getText());
+                setText(null);
+                setGraphic(comboBox);
+            } else {
+            	super.startEdit();
+            	createComboBox();
+            	comboBox.setValue(null);
+            	setText(null);
+            	setGraphic(comboBox);
+            }
+        }
+
+        @Override
+        public void cancelEdit() {
+            super.cancelEdit();
+
+            setText(comboBox.getValue());
+            setGraphic(null);
+        }
+
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else {
+            	if (comboBox == null) {
+            		createComboBox();
+            	}
+            	comboBox.setValue(item);
+            	setText(null);
+            	setGraphic(comboBox);
+            }
+        }
+
+        private void createComboBox() {
+            comboBox = new ComboBox<String>();
+            comboBox.getItems().addAll(options);
+
+            comboBox.setPromptText("");
+            comboBox.setEditable(false); 
+            comboBox.valueProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+					commitEdit(comboBox.getSelectionModel().getSelectedItem());
+					if (newValue == " ") {
+						setCategory(((Filter) getTableView().getItems().get(getTableRow().getIndex())).getCategory());
+					} else {
+						if (newValue != "") {
+							((Filter) getTableView().getItems().get(getTableRow().getIndex())).setType(comboBox.getValue());
+							((Filter) getTableView().getItems().get(getTableRow().getIndex())).setValue(" ");
+						}
+					}
+				}
+                 
+            });
+        }
+	}
+	
+	public class ComparatorComboBoxCell extends TableCell<Filter, String> {
+		private ComboBox<String> comboBox;
+		private ArrayList<String> options;
+
+		private ComparatorComboBoxCell() {
+        	options = new ArrayList<String>();
+        	for (Comparator c : Comparator.values()) {
+        		options.add(c.toString());
+        	}
+        }
+
+		@Override
+        public void startEdit() {
+            if (!isEmpty()) {
+                super.startEdit();
+                createComboBox();
+                comboBox.setValue(getText());
+                setText(null);
+                setGraphic(comboBox);
+            } else {
+            	super.startEdit();
+            	createComboBox();
+            	comboBox.setValue(null);
+            	setText(null);
+            	setGraphic(comboBox);
+            }
+        }
+
+        @Override
+        public void cancelEdit() {
+            super.cancelEdit();
+
+            setText(comboBox.getValue());
+            setGraphic(null);
+        }
+
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else {
+            	if (comboBox == null) {
+            		createComboBox();
+            	}
+            	comboBox.setValue(item);
+            	setText(null);
+            	setGraphic(comboBox);
+            }
+        }
+
+        private void createComboBox() {
+            comboBox = new ComboBox<String>();
+            comboBox.getItems().addAll(options);
+
+            comboBox.setPromptText("");
+            comboBox.setEditable(false);   
+            comboBox.valueProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+					commitEdit(comboBox.getSelectionModel().getSelectedItem());
+					((Filter) getTableView().getItems().get(getTableRow().getIndex())).setComparator(comboBox.getValue());
+				}
+                 
+            });
+        }
+	}
+	
+	public class ValueComboBoxCell extends TableCell<Filter, String> {
+		private ComboBox<String> comboBox;
+		private String type;
+		private ArrayList<String> options;
+
+        private ValueComboBoxCell() {
+        	this.options = new ArrayList<String>();
+        }
+        
+        public void setType(String type) {
+        	this.type = type;
+        	this.options = PredefinedValuesType.fromString(this.type).getTypeValues();
+        	createComboBox();
+        }
+
+        @Override
+        public void startEdit() {
+            if (!isEmpty()) {
+                super.startEdit();
+                createComboBox();
+                comboBox.setValue(getText());
+                setText(null);
+                setGraphic(comboBox);
+            } else {
+            	super.startEdit();
+            	createComboBox();
+            	comboBox.setValue(null);
+            	setText(null);
+            	setGraphic(comboBox);
+            }
+        }
+
+        @Override
+        public void cancelEdit() {
+            super.cancelEdit();
+
+            setText(comboBox.getValue());
+            setGraphic(null);
+        }
+
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else {
+            	if (comboBox == null) {
+            		createComboBox();
+            	}
+            	comboBox.setValue(item);
+            	setText(null);
+            	setGraphic(comboBox);
+            }
+        }
+
+        private void createComboBox() {
+            comboBox = new ComboBox<String>();
+            comboBox.getItems().addAll(options);
+
+            comboBox.setPromptText("");
+            comboBox.setEditable(true);
+            comboBox.valueProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+					if (comboBox.getValue() == " ") {
+						setType(((Filter) getTableView().getItems().get(getTableRow().getIndex())).getType());
+					}
+					
+					commitEdit(comboBox.getSelectionModel().getSelectedItem());
+					((Filter) getTableView().getItems().get(getTableRow().getIndex())).setValue(comboBox.getValue());
+				}
+                 
+            });
+        }
+	}
+	
+	public class PriorityComboBoxCell extends TableCell<Filter, String> {
+		private ComboBox<String> comboBox;
+		private ArrayList<String> options;
+		
+		private PriorityComboBoxCell() {
+			options = new ArrayList<String>();
+        	for (Priority p : Priority.values()) {
+        		options.add(p.toString());
+        	}
+        }
+
+		@Override
+        public void startEdit() {
+            if (!isEmpty()) {
+                super.startEdit();
+                createComboBox();
+                comboBox.setValue(getText());
+                setText(null);
+                setGraphic(comboBox);
+            } else {
+            	super.startEdit();
+            	createComboBox();
+            	comboBox.setValue(null);
+            	setText(null);
+            	setGraphic(comboBox);
+            }
+        }
+
+        @Override
+        public void cancelEdit() {
+            super.cancelEdit();
+
+            setText(comboBox.getValue());
+            setGraphic(null);
+        }
+
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else {
+            	if (comboBox == null) {
+            		createComboBox();
+            	}
+            	comboBox.setValue(item);
+            	setText(null);
+            	setGraphic(comboBox);
+            }
+        }
+
+        private void createComboBox() {
+            comboBox = new ComboBox<String>();
+            comboBox.getItems().addAll(options);
+
+            comboBox.setPromptText("");
+            comboBox.setEditable(false);
+            comboBox.valueProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+					commitEdit(comboBox.getSelectionModel().getSelectedItem());
+					((Filter) getTableView().getItems().get(getTableRow().getIndex())).setPriority(comboBox.getValue());
+				}
+                 
+            });
+        }
 	}
 	
 	public class FileTableButtonCell extends TableCell<Record, Boolean> {
