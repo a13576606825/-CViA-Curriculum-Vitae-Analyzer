@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import com.sun.prism.impl.Disposer.Record;
 
 import evaluator.Comparator;
+import evaluator.Evaluator;
 import evaluator.Priority;
+import evaluator.Result;
 import interpreter.InterpreterRule;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -134,9 +136,9 @@ public class MainViewController extends VBox {
 	private Callback<TableColumn<Filter, String>, TableCell<Filter, String>> priorityComboBoxCellFactory;
 	
 	
-	private ArrayList<String> filterList;
+	private ArrayList<evaluator.Filter> filterList;
 	
-	private ArrayList<Integer> scoreList;
+	private ArrayList<Result> resultList;
 	
 	public MainViewController(double stageWidth, double stageHeight) {
 		initializeCellFactory();
@@ -164,9 +166,9 @@ public class MainViewController extends VBox {
 		textFileList = new ArrayList<File>();
 		textFilePathList = new ArrayList<String>();
 		
-		filterList = new ArrayList<String>();
+		filterList = new ArrayList<evaluator.Filter>();
 		
-		scoreList = new ArrayList<Integer>();
+		resultList = new ArrayList<Result>();
 		
 		categoryList = InterpreterRule.getCategoryList();
 	}
@@ -505,15 +507,15 @@ public class MainViewController extends VBox {
 					textFilePathList.add(CVReader.convertFile(file).getAbsolutePath().substring(
 							System.getProperty("user.dir").length() + 1));
 				}
-				setFilterList();
-				scoreList = Interpreter.getQueryScore(textFilePathList, filterList, true);
 				
-				for (int i=0; i<scoreList.size(); i++) {
-					System.out.println(scoreList.get(i));
-					
-					resultData.add(new EvaluatedRecord(originalFileList.get(i).getName(),
-							scoreList.get(i).toString()));
+				setFilterList();
+				
+				Evaluator evaluator = new Evaluator();
+				for (File file : textFileList) {
+					evaluator.addCV(file);
 				}
+				
+				resultList =  evaluator.query(filterList);
 			}
 		});
 		
@@ -555,7 +557,11 @@ public class MainViewController extends VBox {
 	}
 	
 	private void setFilterList() {
+		filterList = new ArrayList<evaluator.Filter>();
 		
+		for (Filter f : filterData) {
+			filterList.add(new evaluator.Filter(f.getCategory(), f.getType(), f.getKey(), Comparator.getComparator(f.getComparator()), f.getValue(), Priority.getPriority(f.getPriority())));
+		}
 	}
 	
 	private boolean isCVFileType(String type) {
@@ -804,6 +810,8 @@ public class MainViewController extends VBox {
 					if (newValue != "") {
 						((Filter) getTableView().getItems().get(getTableRow().getIndex())).setCategory(comboBox.getValue());
 						((Filter) getTableView().getItems().get(getTableRow().getIndex())).setType(" ");
+						((Filter) getTableView().getItems().get(getTableRow().getIndex())).setType("");
+						((Filter) getTableView().getItems().get(getTableRow().getIndex())).setType(" ");
 					}
 					
 				}
@@ -891,6 +899,8 @@ public class MainViewController extends VBox {
 					} else {
 						if (newValue != "") {
 							((Filter) getTableView().getItems().get(getTableRow().getIndex())).setType(comboBox.getValue());
+							((Filter) getTableView().getItems().get(getTableRow().getIndex())).setValue(" ");
+							((Filter) getTableView().getItems().get(getTableRow().getIndex())).setValue("");
 							((Filter) getTableView().getItems().get(getTableRow().getIndex())).setValue(" ");
 						}
 					}
@@ -1043,7 +1053,6 @@ public class MainViewController extends VBox {
 					commitEdit(comboBox.getSelectionModel().getSelectedItem());
 					((Filter) getTableView().getItems().get(getTableRow().getIndex())).setValue(comboBox.getValue());
 				}
-                 
             });
         }
 	}

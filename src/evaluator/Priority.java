@@ -16,6 +16,18 @@ public enum Priority {
 		return this.priority;
 	}
 	
+	public static Priority getPriority(String s) {
+		if (s.equals("high")) {
+			return Priority.High;
+		} else if (s.equals("medium")) {
+			return Priority.Medium;
+		} else if (s.equals("low")) {
+			return Priority.Low;
+		} else {
+			return Priority.Empty;
+		}
+	}
+	
 	public int toGrade() {
 		if(this == High) {
 			return 10;

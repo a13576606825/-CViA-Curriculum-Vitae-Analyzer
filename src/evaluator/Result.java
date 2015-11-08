@@ -3,19 +3,29 @@ package evaluator;
 import java.util.ArrayList;
 
 public class Result implements Comparable<Result> {
-	final String fileName;
+	private final String fileName;
 	//final String Email;
-	final int marks;
+	private final int marks;
 	//final String personalInfo;
-	final ArrayList<String> filterString;
-	
+	private final ArrayList<String> filterString;	
 	
 	public Result(String fileName, int marks, ArrayList<String> filterString) {
 		this.fileName = fileName;
 		this.marks = marks; 
 		this.filterString = filterString;
 	}
-
+	
+	public String getfileName() {
+		return this.fileName;
+	}
+	
+	public int getMark() {
+		return this.marks;
+	}
+	
+	public ArrayList<String> getFilterString() {
+		return this.filterString;
+	}
 
 	@Override
 	public int compareTo(Result o) {

@@ -19,6 +19,24 @@ public enum Comparator {
 		return this.comparator;
 	}
 	
+	public static Comparator getComparator(String s) {
+		if (s.equals(">")) {
+			return Comparator.Larger;
+		} else if (s.equals("<")) {
+			return Comparator.Smaller;
+		} else if (s.equals("=")) {
+			return Comparator.Equal;
+		} else if (s.equals(">=")) {
+			return Comparator.LargerOrEqual;
+		} else if (s.equals("<=")) {
+			return Comparator.SmallerOrEqual;
+		} else if (s.equals("!=")) {
+			return Comparator.NotEqual;
+		} else {
+			return Comparator.Empty;
+		}
+	}
+	
 	public boolean compareTwoDouble(double s1, double s2) {
 		if(this == Larger) {
 			return s1>s2;
