@@ -14,7 +14,6 @@ public class OpenFolder {
 	private static boolean isMac() {
 		return (OS.indexOf("mac") >= 0);
 	}
-	
 
 	public static void openFolder(File f) {
 		String command;
@@ -33,11 +32,18 @@ public class OpenFolder {
 		}
 	}
 	
+	/*
 	public static void main(String[] args){
 		File f = new File("E:\\opencv\\opencv\\README.md.txt");
-		//Runtime.getRuntime().exec("explorer.exe " +  f.getParentFile().getAbsolutePath());
 		openFolder(f);
 	}
+	//*/
+	
+	/* 
+	public static void main(String[] args) {
+		openFolder(new File("/Users/JJ/Desktop/CS4211\\ Final\\ Presentation.key"));
+	}
+	//*/
 }
 
 
