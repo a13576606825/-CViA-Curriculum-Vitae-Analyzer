@@ -41,3 +41,8 @@ TableView .table-cell {
     -fx-background-radius: 5, 5, 4;   
 }
 
+.title-label{
+	-fx-font-size: 35px;
+	-fx-font-weight: bold;
+	-fx-text-fill: white;
+}

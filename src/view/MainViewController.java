@@ -23,6 +23,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -51,6 +52,9 @@ public class MainViewController extends VBox {
 	private static final String TXT = "txt";
 	private static final String XLS = "xls";
 	private static final String XML = "xml";
+	
+	private static final String TITLE_TEXT = "CViA";
+	private static final double TITLE_WIDTH = 90;
 	
 	private static final String ICON_PATH = "icon.png";
 	private static final double ICON_WIDTH = 50;
@@ -99,6 +103,7 @@ public class MainViewController extends VBox {
 	
 	private ImageView iconImageView;
 	private Image iconImage;
+	private Label titleLabel;
 	
 	private Button importSingleButton;
 	private Button importMultipleButton;
@@ -177,6 +182,8 @@ public class MainViewController extends VBox {
 	private void initializeMainView() {
 		iconImageView = new ImageView();
         iconImage = new Image(MainView.class.getResourceAsStream(ICON_PATH));
+        
+        titleLabel = new Label(TITLE_TEXT);
 		
 		importSingleButton = new Button(IMPORT_SINGLE_BUTTON_TEXT);
 		importMultipleButton = new Button(IMPORT_MULTIPLE_BUTTON_TEXT);
@@ -185,7 +192,7 @@ public class MainViewController extends VBox {
 		exportButton = new Button(EXPORT_BUTTON_TEXT);
 		
 		buttonBox = new HBox();
-		buttonBox.getChildren().addAll(iconImageView, importSingleButton, importMultipleButton, filterButton, processButton, exportButton);
+		buttonBox.getChildren().addAll(iconImageView, titleLabel, importSingleButton, importMultipleButton, filterButton, processButton, exportButton);
 		
 		fileTable = new TableView<FileObject>();
 		initializeFileTableView(fileTable, FILE_TABLE_COLUMN, FILE_TABLE_COLUMN_PROPERTY);
@@ -398,16 +405,20 @@ public class MainViewController extends VBox {
 	}
 	
 	private void initializeButtonBox() {
-		HBox.setMargin(iconImageView, new Insets(PADDING_SIZE/2, 0, PADDING_SIZE/2, widthBetweenButton/4));
+		HBox.setMargin(iconImageView, new Insets(PADDING_SIZE/2, 0, PADDING_SIZE/2, widthBetweenButton/3));
 		iconImageView.setFitHeight(ICON_HEIGHT);
 		iconImageView.setFitWidth(ICON_WIDTH);
 		iconImageView.setImage(iconImage);
 		
-		HBox.setMargin(importSingleButton, new Insets(PADDING_SIZE, widthBetweenButton/3, PADDING_SIZE, widthBetweenButton*2));
-		HBox.setMargin(importMultipleButton, new Insets(PADDING_SIZE, widthBetweenButton/3, PADDING_SIZE, widthBetweenButton/3));
-		HBox.setMargin(filterButton, new Insets(PADDING_SIZE, widthBetweenButton/3, PADDING_SIZE, widthBetweenButton/3));
-		HBox.setMargin(processButton, new Insets(PADDING_SIZE, widthBetweenButton/3, PADDING_SIZE, widthBetweenButton/3));
-		HBox.setMargin(exportButton, new Insets(PADDING_SIZE, widthBetweenButton, PADDING_SIZE, widthBetweenButton/3));
+		HBox.setMargin(titleLabel, new Insets(PADDING_SIZE/1.5, 0, PADDING_SIZE/2, widthBetweenButton/2));
+		titleLabel.setMaxWidth(TITLE_WIDTH);
+		titleLabel.setMinWidth(TITLE_WIDTH);
+		
+		HBox.setMargin(importSingleButton, new Insets(PADDING_SIZE, widthBetweenButton/4, PADDING_SIZE, widthBetweenButton));
+		HBox.setMargin(importMultipleButton, new Insets(PADDING_SIZE, widthBetweenButton/4, PADDING_SIZE, widthBetweenButton/4));
+		HBox.setMargin(filterButton, new Insets(PADDING_SIZE, widthBetweenButton/4, PADDING_SIZE, widthBetweenButton/4));
+		HBox.setMargin(processButton, new Insets(PADDING_SIZE, widthBetweenButton/4, PADDING_SIZE, widthBetweenButton/4));
+		HBox.setMargin(exportButton, new Insets(PADDING_SIZE, widthBetweenButton, PADDING_SIZE, widthBetweenButton/4));
 		
 		importSingleButton.setMaxSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 		importSingleButton.setMinSize(BUTTON_WIDTH, BUTTON_HEIGHT);
@@ -429,6 +440,7 @@ public class MainViewController extends VBox {
 	}
 	
 	private void initializeStyleClass() {
+		titleLabel.getStyleClass().add("title-label");
 		preprocessBox.getStyleClass().add("preprocess-box");
 		buttonBox.getStyleClass().add("button-box");
 		resultBox.getStyleClass().add("result-pane");
