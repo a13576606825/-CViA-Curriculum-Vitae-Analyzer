@@ -1,7 +1,6 @@
 package logic;
 
 import interpreter.Utils;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -16,13 +15,12 @@ public class OpenFolder {
 		return (OS.indexOf("mac") >= 0);
 	}
 
-	
-	public static void openFolder(String path) {
+	public static void openFolder(File f) {
 		String command;
 		if (isWindows()) {
-			command = new String("explorer.exe " +path);
+			command = "rundll32 SHELL32.DLL,ShellExec_RunDLL " + "Explorer.exe /select," + f.getAbsolutePath();
 		} else if (isMac()) {
-			command = new String("open -R "+  path);
+			command = new String("open -R "+  f.getAbsolutePath());
 			Utils.debug(command);
 		} else {
 			return;
@@ -33,11 +31,19 @@ public class OpenFolder {
 			e.printStackTrace();
 		}
 	}
-	 
-	public static void main(String[] args) {
-
-		openFolder("/Users/JJ/Desktop/CS4211\\ Final\\ Presentation.key");
+	
+	/*
+	public static void main(String[] args){
+		File f = new File("E:\\opencv\\opencv\\README.md.txt");
+		openFolder(f);
 	}
+	//*/
+	
+	/* 
+	public static void main(String[] args) {
+		openFolder(new File("/Users/JJ/Desktop/CS4211\\ Final\\ Presentation.key"));
+	}
+	//*/
 }
 
 
