@@ -20,6 +20,9 @@ public class Evaluator {
 
 	private HashMap<String, JSONObject> cvMap;
 	
+	public Evaluator() {
+		cvMap = new HashMap<String, JSONObject>();
+	}
 	
 	public void addCV(File cvFile) {
 		String name = cvFile.getName();
