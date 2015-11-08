@@ -14,6 +14,7 @@ import evaluator.Priority;
 import evaluator.Result;
 import interpreter.InterpreterRule;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -40,7 +41,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
-import logic.Interpreter;
 import parser.CVReader;
 import predefinedValues.PredefinedValuesType;
 
@@ -88,11 +88,10 @@ public class MainViewController extends VBox {
 	private static final String[] FILTER_TABLE_COLUMN = {"Category", "Type", "Key", "Comparator", "Value", "Priority"};
 	private static final String[] FILTER_TABLE_COLUMN_PROPERTY = {"category", "type", "key", "comparator", "value", "priority"};
 	
-	private static final String[] RESULT_TABLE_COLUMN = {"Filename", "Score"};
-	private static final String[] RESULT_TABLE_COLUMN_PROPERTY = {"filename", "score"};
-	
 	private ObservableList<FileObject> fileData = FXCollections.observableArrayList();
-	private ObservableList<Filter> filterData = FXCollections.observableArrayList();
+	private ObservableList<Filter> filterData = FXCollections.observableArrayList(
+			new Filter("skill", "info", "java", "", "", "high")
+			);
 	
 	private ObservableList<EvaluatedRecord> resultData = FXCollections.observableArrayList();
 	
@@ -208,8 +207,6 @@ public class MainViewController extends VBox {
 		preprocessBox.getChildren().addAll(fileTable, filterTable);
 		
 		resultTable = new TableView<EvaluatedRecord>();
-//		initializeResultTableView(resultTable, RESULT_TABLE_COLUMN, RESULT_TABLE_COLUMN_PROPERTY);
-		resultTable.setItems(resultData);
 		
 		resultBox = new VBox();
 		resultBox.getChildren().addAll(resultTable);
@@ -316,33 +313,36 @@ public class MainViewController extends VBox {
 		table.setEditable(true);
 	}
 	
-	private void initializeResultTableView(TableView<EvaluatedRecord> table, String[] columns, String[] columnProperties) {
-		for (int i=0; i<columns.length; i++) {
-			int currentIndex = i;
-			TableColumn<EvaluatedRecord, String> tableColumn = new TableColumn<EvaluatedRecord, String>(columns[i]);
-			tableColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-			tableColumn.setOnEditCommit(new EventHandler<CellEditEvent<EvaluatedRecord, String>>() {
-				@Override
-				public void handle(CellEditEvent<EvaluatedRecord, String> event) {
-					EvaluatedRecord file = (EvaluatedRecord) event.getTableView().getItems().get(event.getTablePosition().getRow());
-					switch (currentIndex) {
-						case 0:
-							file.setFilename(event.getNewValue());
-							break;
-						case 1:
-							file.setScore(event.getNewValue());
-							break;
-						default:
-							break;
-					}
-				}	
-			});
-			tableColumn.setCellValueFactory(new PropertyValueFactory<EvaluatedRecord, String>(columnProperties[i]));
-			table.getColumns().add(tableColumn);
+	private void initializeResultTableView(TableView<EvaluatedRecord> table) {
+		TableColumn<EvaluatedRecord, String> filenameColumn = new TableColumn<EvaluatedRecord, String>("Filename");
+		filenameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+		filenameColumn.setCellValueFactory(new PropertyValueFactory<EvaluatedRecord, String>("filename"));
+		table.getColumns().add(filenameColumn);
+		
+		TableColumn<EvaluatedRecord, String> scoreColumn = new TableColumn<EvaluatedRecord, String>("Score");
+		scoreColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+		scoreColumn.setCellValueFactory(new PropertyValueFactory<EvaluatedRecord, String>("score"));
+		table.getColumns().add(scoreColumn);
+		
+		ArrayList<String> filterList = new ArrayList<String>();
+		ArrayList<String> filterMatchList = new ArrayList<String>();
+		
+		for (Filter f : this.filterData) {
+			filterList.add(f.getCategory() + ":" + f.getKey());
+			filterMatchList.add(f.getCategory() + " match");
+		}
+		
+		for (int i=0; i<filterList.size(); i++) {
+			TableColumn<EvaluatedRecord, String> filterColumn = new TableColumn<EvaluatedRecord, String>(filterList.get(i));
+			filenameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+			table.getColumns().add(filterColumn);
+			
+			TableColumn<EvaluatedRecord, String> filterMatchColumn = new TableColumn<EvaluatedRecord, String>(filterMatchList.get(i));
+			scoreColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+			table.getColumns().add(filterMatchColumn);
 		}
 
 		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-		table.setEditable(true);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -497,6 +497,9 @@ public class MainViewController extends VBox {
 		processButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				initializeResultTableView(resultTable);
+				resultTable.setItems(resultData);
+				
 				final String dir = System.getProperty("user.dir");
 		        System.out.println(dir);
 				for (File file : originalFileList) {
@@ -516,6 +519,9 @@ public class MainViewController extends VBox {
 				}
 				
 				resultList =  evaluator.query(filterList);
+				
+				
+			
 			}
 		});
 		
@@ -722,11 +728,22 @@ public class MainViewController extends VBox {
 	
 	public static class EvaluatedRecord {
 		private final SimpleStringProperty filename;
-		private final SimpleStringProperty score;
+		private final SimpleIntegerProperty score;
+		private final ArrayList<String> filterList;
+		private final ArrayList<String> filterMatchList;
 		
-		public EvaluatedRecord(String filename, String score) {
+		public EvaluatedRecord(String filename, int score) {
 			this.filename = new SimpleStringProperty(filename);
-			this.score = new SimpleStringProperty(score);
+			this.score = new SimpleIntegerProperty(score);
+			this.filterList = new ArrayList<String>();
+			this.filterMatchList = new ArrayList<String>();
+		}
+		
+		public EvaluatedRecord(String filename, int score, ArrayList<String> filterList, ArrayList<String> filterMatchList) {
+			this.filename = new SimpleStringProperty(filename);
+			this.score = new SimpleIntegerProperty(score);
+			this.filterList = filterList;
+			this.filterMatchList = filterMatchList;
 		}
 		
 		public String getFilename() {
@@ -737,12 +754,20 @@ public class MainViewController extends VBox {
 			this.filename.set(filename);
 		}
 		
-		public String getScore() {
+		public int getScore() {
 			return score.get();
 		}
 		
-		public void setScore(String score) {
+		public void setScore(int score) {
 			this.score.set(score);
+		}
+		
+		public ArrayList<String> getFilterList() {
+			return this.filterList;
+		}
+		
+		public ArrayList<String> getFilterMatchList() {
+			return this.filterMatchList;
 		}
 	}
 	
