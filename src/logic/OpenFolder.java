@@ -1,5 +1,8 @@
 package logic;
 
+import interpreter.Utils;
+
+import java.io.File;
 import java.io.IOException;
 
 public class OpenFolder {
@@ -13,19 +16,52 @@ public class OpenFolder {
 		return (OS.indexOf("mac") >= 0);
 	}
 	
-	public void openFolder(String path) {
-		String command = new String();
+	private static final String[] prefix = {
+	      "osascript",
+	      "-e", "tell application \"Finder\"",
+	      "-e", "activate",
+	      "-e", "<openCmdGoesHere>",
+	      "-e", "end tell"
+	  };
+	 
+	  private static String buildFolderCommand(String folderPath) {
+	    StringBuilder openCommand = new StringBuilder("open ");
+	    String[] pathParts = folderPath.split("/");
+	    for (int i = pathParts.length - 1; i > 0; i--) {
+	      openCommand.append("folder \"").append(pathParts[i]).append("\" of ");
+	    }
+	    return openCommand.append("startup disk").toString();
+	  }
+
+	
+	public static void openFolder(String path) {
+		String command;
 		if (isWindows()) {
-			command = "explorer.exe ";
+			command = new String("explorer.exe " +path);
 		} else if (isMac()) {
-			command = "open ";
+			command = new String("open -R "+  path);
+			Utils.debug(command);
 		} else {
 			return;
 		}
 		try {
-			Runtime.getRuntime().exec(command + path);
+			Runtime.getRuntime().exec(command);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	 
+	public static void main(String[] args) {
+//		openFolder( new File("/Users/JJ/Desktop/File Interchange").getAbsolutePath());
+//		prefix[6] = buildFolderCommand("/Users/JJ/Desktop/CS4211 Final Presentation.key/");
+//		try {
+//			Runtime.getRuntime().exec(prefix).waitFor();
+//		} catch (InterruptedException | IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		openFolder("/Users/JJ/Desktop/CS4211\\ Final\\ Presentation.key");
+	}
 }
+
+
