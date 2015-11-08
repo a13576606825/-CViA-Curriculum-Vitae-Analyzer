@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import predefinedValues.PredefinedValue;
 import predefinedValues.PredefinedValuesFactory;
 
@@ -80,6 +81,7 @@ public class Evaluator {
 		    Result res = new Result(currentName, currentScore, filterStringList);
 		    resultList.add(res);
 		}
+		Collections.sort(resultList);
 		return resultList;
 		
 	}
