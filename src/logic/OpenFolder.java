@@ -1,5 +1,6 @@
 package logic;
 
+import java.io.File;
 import java.io.IOException;
 
 public class OpenFolder {
@@ -13,19 +14,31 @@ public class OpenFolder {
 		return (OS.indexOf("mac") >= 0);
 	}
 	
-	public void openFolder(String path) {
+	public void openFolder(File f) {
 		String command = new String();
 		if (isWindows()) {
-			command = "explorer.exe ";
+			command = "rundll32 SHELL32.DLL,ShellExec_RunDLL " + "Explorer.exe /select," + f.getAbsolutePath();
 		} else if (isMac()) {
 			command = "open ";
 		} else {
 			return;
 		}
 		try {
-			Runtime.getRuntime().exec(command + path);
+			Runtime.getRuntime().exec(command);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
+//	public static void main(String[] args){
+//		try {
+//			File f = new File("E:\\opencv\\opencv\\README.md.txt");
+//			//Runtime.getRuntime().exec("explorer.exe " +  f.getParentFile().getAbsolutePath());
+//			Runtime.getRuntime().exec(
+//                    "rundll32 SHELL32.DLL,ShellExec_RunDLL " +
+//                    "Explorer.exe /select," + f.getAbsolutePath());
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 }
