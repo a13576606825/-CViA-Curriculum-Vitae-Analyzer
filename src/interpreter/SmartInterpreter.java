@@ -15,6 +15,7 @@ import java.util.Iterator;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import predefinedValues.PredefinedValue;
 import predefinedValues.PredefinedValuesFactory;
@@ -37,6 +38,29 @@ public class SmartInterpreter {
 	}
 	
 	public JSONObject build() {
+		String fileName = toInterprete.getName().substring(0, toInterprete.getName().indexOf("."));
+		String export = Utils.TEST_TEMP_PATH+ fileName +".json";
+		File file = new File(export);
+		try {
+			if(file.exists()) {
+				JSONParser parser = new JSONParser();
+				Object obj = parser.parse(new FileReader(file));
+				exportDataMap = (JSONObject) obj;
+				return exportDataMap;
+			}
+			
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (org.json.simple.parser.ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
 		try (BufferedReader br = new BufferedReader(new FileReader(toInterprete))) {
 		    String line;
 		    while ((line = br.readLine()) != null) {
@@ -54,9 +78,7 @@ public class SmartInterpreter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		String fileName = toInterprete.getName().substring(0, toInterprete.getName().indexOf("."));
-		String export = Utils.TEST_TEMP_PATH+ fileName +".json";
-		File file = new File(export);
+		
 		// if file doesnt exists, then create it
 		try {
 			if (!file.exists()) {
