@@ -65,7 +65,7 @@ public class MainViewController extends VBox {
 	
 	private static final String IMPORT_SINGLE_BUTTON_TEXT = "Add a CV";
 	private static final String IMPORT_MULTIPLE_BUTTON_TEXT = "Add CVs";
-	private static final String FILTER_BUTTON_TEXT = "Add Filter";
+	private static final String FILTER_BUTTON_TEXT = "Add Requirement";
 	private static final String PROCESS_BUTTON_TEXT = "Analyse";
 	private static final String EXPORT_BUTTON_TEXT = "Export";
 	
@@ -136,7 +136,7 @@ public class MainViewController extends VBox {
 	private Callback<TableColumn<Filter, String>, TableCell<Filter, String>> priorityComboBoxCellFactory;
 	
 	
-	private ArrayList<evaluator.Filter> filterList;
+	private ArrayList<evaluator.Requirement> filterList;
 	
 	private ArrayList<Result> resultList;
 	
@@ -166,7 +166,7 @@ public class MainViewController extends VBox {
 		textFileList = new ArrayList<File>();
 		textFilePathList = new ArrayList<String>();
 		
-		filterList = new ArrayList<evaluator.Filter>();
+		filterList = new ArrayList<evaluator.Requirement>();
 		
 		resultList = new ArrayList<Result>();
 		
@@ -570,10 +570,10 @@ public class MainViewController extends VBox {
 	}
 	
 	private void setFilterList() {
-		filterList = new ArrayList<evaluator.Filter>();
+		filterList = new ArrayList<evaluator.Requirement>();
 		
 		for (Filter f : filterData) {
-			filterList.add(new evaluator.Filter(f.getCategory(), f.getType(), f.getKey(), Comparator.getComparator(f.getComparator()), f.getValue(), Priority.getPriority(f.getPriority())));
+			filterList.add(new evaluator.Requirement(f.getCategory(), f.getType(), f.getKey(), Comparator.getComparator(f.getComparator()), f.getValue(), Priority.getPriority(f.getPriority())));
 		}
 	}
 	

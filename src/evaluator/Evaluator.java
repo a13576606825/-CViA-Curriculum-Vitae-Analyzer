@@ -41,7 +41,7 @@ public class Evaluator {
 		}
 	}
 	
-	public ArrayList<Result> query(ArrayList<Filter> filters) {
+	public ArrayList<Result> query(ArrayList<Requirement> filters) {
 		
 		ArrayList<Result> resultList = new ArrayList<Result>();
 		for (Entry<String, JSONObject> cvEntry : cvMap.entrySet()) {
@@ -49,7 +49,7 @@ public class Evaluator {
 		    int currentScore = 0;
 		    JSONObject currentCV = cvEntry.getValue();
 		    ArrayList<String> filterStringList = new ArrayList<String>();
-		    for (Filter filter: filters) {
+		    for (Requirement filter: filters) {
 		    	String category = filter.getCategory();
 		    	String type = filter.getType();
 		    	String keyword = filter.getKeyword();
