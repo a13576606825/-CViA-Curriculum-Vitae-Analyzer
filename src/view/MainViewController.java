@@ -321,6 +321,8 @@ public class MainViewController extends VBox {
 	}
 	
 	private void initializeResultTableView(TableView<EvaluatedRecord> table) {
+		table.getColumns().clear();
+		resultData.clear();
 		TableColumn<EvaluatedRecord, String> filenameColumn = new TableColumn<EvaluatedRecord, String>("Filename");
 		filenameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		filenameColumn.setCellValueFactory(new PropertyValueFactory<EvaluatedRecord, String>("filename"));
