@@ -37,6 +37,7 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.TooltipBuilder;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
@@ -821,7 +822,17 @@ public class MainViewController extends VBox {
 		public void updateItem(String item, boolean empty) {
             super.updateItem(item, empty);
             this.setText(item);
-            this.setTooltip((empty || item==null) ? null : new Tooltip(item.trim()));
+            int i = 100;
+            String result = "";
+            if (item != null) {
+            	while (item!=null && i < item.length()) {
+            		result = item.substring(i-100,i) + "\n" + item.substring(i);
+            		i += 100;
+            	}
+            } else {
+            	result = item;
+            }
+            this.setTooltip((empty || item==null) ? null : new Tooltip(result.trim()));
         }
 	}
 	
