@@ -55,11 +55,8 @@ public class MainViewController extends VBox {
 	
 	private static final String DOC = "doc";
 	private static final String DOCX = "docx";
-	private static final String HTML = "html";
 	private static final String PDF = "pdf";
 	private static final String TXT = "txt";
-	private static final String XLS = "xls";
-	private static final String XML = "xml";
 	
 	private static final String BASE_PATH = "test/CVs";
 	
@@ -643,12 +640,11 @@ public class MainViewController extends VBox {
 	}
 	
 	private boolean isCVFileType(String type) {
-		if (!type.equals(DOC) && !type.equals(DOCX) && !type.equals(HTML) &&
-				!type.equals(PDF) && !type.equals(TXT) && !type.equals(XLS) && !type.equals(XML)) {
-			return false;
+		if (type!=null && (type.equals(DOC) || type.equals(DOCX) || type.equals(PDF) || type.equals(TXT))) {
+			return true;
 		}
 		
-		return true;
+		return false;
 	}
 	
 	private void addFile(boolean isConverted, File file) {
@@ -666,7 +662,7 @@ public class MainViewController extends VBox {
 		if (file.exists() && !file.isDirectory() && file.isFile()) {
 			String filename = file.getName();
 			String[] tokens = filename.split("\\.(?=[^\\.]+$)");
-			System.out.println(tokens[1]);
+			
 			return tokens[1];
 		}
 		
