@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.Desktop;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -26,6 +27,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -1176,6 +1179,9 @@ public class MainViewController extends VBox {
 	
 	public class FileTableButtonCell extends TableCell<Record, Boolean> {
         final Button cellButton = new Button("X");
+        final Button viewButton = new Button("O");
+        
+        final HBox buttonPart = new HBox();
         
         FileTableButtonCell () {
             
@@ -1188,6 +1194,41 @@ public class MainViewController extends VBox {
                 	FileObject currentFile = (FileObject) FileTableButtonCell.this.getTableView().getItems().get(FileTableButtonCell.this.getIndex());
                 	//remove selected item from the table list
                 	fileData.remove(currentFile);
+                	for (int i=0; i<originalFileList.size(); i++) {
+                		if (currentFile.getFilename().equals(originalFileList.get(i).getName())) {
+                			originalFileList.remove(i);
+                			break;
+                		}
+                	}
+                }
+            });
+            
+            viewButton.setOnAction(new EventHandler<ActionEvent>(){
+
+                @Override
+                public void handle(ActionEvent t) {
+                	FileObject currentFile = (FileObject) FileTableButtonCell.this.getTableView().getItems().get(FileTableButtonCell.this.getIndex());
+                	File file = null;
+                	
+                	for (int i=0; i<originalFileList.size(); i++) {
+                		if (currentFile.getFilename().equals(originalFileList.get(i).getName())) {
+                			file = originalFileList.get(i);
+                			break;
+                		}
+                	}
+                	
+                	Desktop dt = Desktop.getDesktop();
+                    try {
+						if (file == null) {
+							Alert alert = new Alert(AlertType.INFORMATION);
+							alert.setTitle("Information Dialog");
+							alert.showAndWait();
+						} else {
+							dt.open(file);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
                 }
             });
         }
@@ -1197,7 +1238,12 @@ public class MainViewController extends VBox {
         protected void updateItem(Boolean t, boolean empty) {
             super.updateItem(t, empty);
             if(!empty){
-                setGraphic(cellButton);
+            	viewButton.setStyle("-fx-text-fill: green;");
+            	cellButton.setStyle("-fx-text-fill: red;");
+            	buttonPart.getChildren().add(viewButton);
+            	buttonPart.getChildren().add(cellButton);
+            	buttonPart.setPadding(new Insets(0, 0, 0, 7));
+                setGraphic(buttonPart);
             } else {
             	setGraphic(null);
             }
@@ -1227,6 +1273,7 @@ public class MainViewController extends VBox {
         protected void updateItem(Boolean t, boolean empty) {
             super.updateItem(t, empty);
             if(!empty){
+            	cellButton.setStyle("-fx-text-fill: red;");
                 setGraphic(cellButton);
             } else {
             	setGraphic(null);
