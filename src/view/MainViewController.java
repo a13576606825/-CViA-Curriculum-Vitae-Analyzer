@@ -276,7 +276,6 @@ public class MainViewController extends VBox {
 					tableColumn.setOnEditCommit(new EventHandler<CellEditEvent<Filter, String>>() {
 						@Override
 						public void handle(CellEditEvent<Filter, String> event) {
-							System.out.println("edit");
 							Filter filter = (Filter) event.getTableView().getItems().get(event.getTablePosition().getRow());
 							filter.setCategory(event.getNewValue());
 						}
@@ -361,13 +360,11 @@ public class MainViewController extends VBox {
 		
 		for (Filter f : this.filterData) {
 			filterList.add(f.getCategory());
-			System.out.println(f.getCategory());
 			filterMatchList.add("match");
 		}
-		System.out.println(filterList.size());
+		
 		for (int i=0; i<filterList.size(); i++) {
 			int index = i;
-			
 			TableColumn filterColumn = new TableColumn(filterList.get(i));
 			filterColumn.setCellValueFactory(new Callback<CellDataFeatures<ObservableList<String>, String>, ObservableValue<String>>() {
 				@Override
@@ -504,8 +501,6 @@ public class MainViewController extends VBox {
 				File file = fileChooser.showOpenDialog(importSingleButton.getScene().getWindow());
                 // Process the file
 				if (file != null && file.isFile()) {
-					System.out.println(file.getName());
-					
 					addFile(false, file);
 				}
 			}
@@ -520,8 +515,6 @@ public class MainViewController extends VBox {
 				File dir = dirChooser.showDialog(importMultipleButton.getScene().getWindow());
                 // Process the file
 				if (dir != null && dir.isDirectory()) {
-					System.out.println(dir.getName());
-					
 					File[] files = dir.listFiles();
 					for (File file : files) {
 						addFile(false, file);
@@ -533,9 +526,6 @@ public class MainViewController extends VBox {
 		filterButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				for (Filter f : filterData) {
-					System.out.println(f.getCategory() + ", " + f.getType() + ", " + f.getKey() + ", " + f.getComparator() + ", " + f.getValue() + ", " + f.getPriority());
-				}
 				filterData.add(new Filter("", "", "", "", "", ""));
 			}
 		});
@@ -567,10 +557,8 @@ public class MainViewController extends VBox {
 				for (File file : textFileList) {
 					evaluator.addCV(file);
 				}
-				
-				System.out.println("start evaluating");
+
 				resultList =  evaluator.query(filterList);
-				System.out.println("finish evaluating");
 				
 				initializeResultTableView(resultTable);
 				resultTable.setItems(evaluatedResultData);
@@ -585,11 +573,9 @@ public class MainViewController extends VBox {
 				    	row.add(filterList.get(i).getCategory() + " " + filterList.get(i).getKeyword());
 				    	row.add(result.getFilterString().get(i));
 				    }
-				    System.out.println("one row added");
+
 				    resultTable.getItems().add(row);
 				}
-				
-				System.out.println("finish processing");
 			
 			}
 		});
@@ -844,8 +830,7 @@ public class MainViewController extends VBox {
 		public void updateItem(String item, boolean empty) {
             super.updateItem(item, empty);
             this.setText(item);
-            this.setTooltip(
-                    (empty || item==null) ? null : new Tooltip(item));
+            this.setTooltip((empty || item==null) ? null : new Tooltip(item.trim()));
         }
 	}
 	
@@ -920,13 +905,6 @@ public class MainViewController extends VBox {
 				}
                  
             });
-//            
-//            comboBox.setOnAction((e) -> {
-//                //System.out.println("Committed: " + comboBox.getSelectionModel().getSelectedItem());
-//            	System.out.println("haha");
-//            	getTableView().edit(getIndex(), getTableColumn());
-//                commitEdit(comboBox.getSelectionModel().getSelectedItem());
-//            });
         }
 	}
 	

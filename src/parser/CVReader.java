@@ -141,6 +141,8 @@ public class CVReader {
 
     		while ((sCurrentLine = br.readLine()) != null) {
     			bw.write(sCurrentLine);
+    			bw.newLine();
+    			bw.flush();
     		}
             
     		br.close();
