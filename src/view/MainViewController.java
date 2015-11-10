@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.json.simple.JSONObject;
+
 import com.sun.prism.impl.Disposer.Record;
 
 import evaluator.Comparator;
@@ -13,6 +15,7 @@ import evaluator.Evaluator;
 import evaluator.Priority;
 import evaluator.Result;
 import interpreter.InterpreterRule;
+import interpreter.SmartInterpreter;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -126,6 +129,8 @@ public class MainViewController extends VBox {
 	private ArrayList<File> textFileList;
 	private ArrayList<String> textFilePathList;
 	
+	private ArrayList<JSONObject> jsonList;
+	
 	private ArrayList<String> categoryList;
 	
 	private Callback<TableColumn<Filter, String>, TableCell<Filter, String>> categoryComboBoxCellFactory;
@@ -165,6 +170,7 @@ public class MainViewController extends VBox {
 		originalFileList = new ArrayList<File>();
 		textFileList = new ArrayList<File>();
 		textFilePathList = new ArrayList<String>();
+		jsonList = new ArrayList<JSONObject>();
 		
 		filterList = new ArrayList<evaluator.Filter>();
 		
@@ -501,20 +507,27 @@ public class MainViewController extends VBox {
 				initializeResultTableView(resultTable);
 				resultTable.setItems(resultData);
 				
-				final String dir = System.getProperty("user.dir");
-		        System.out.println(dir);
+				//final String dir = System.getProperty("user.dir");
+		        
 				for (File file : originalFileList) {
-					
 					addFile(true, CVReader.convertFile(file));
-					System.out.println(CVReader.convertFile(file).getAbsolutePath().substring(
-							System.getProperty("user.dir").length() + 1));
+					
 					textFilePathList.add(CVReader.convertFile(file).getAbsolutePath().substring(
 							System.getProperty("user.dir").length() + 1));
 				}
 				
 				setFilterList();
 				
+				for (File file : textFileList) {
+					SmartInterpreter interpreter = new SmartInterpreter(file);
+					jsonList.add(interpreter.build());
+				}
+				
 				Evaluator evaluator = new Evaluator();
+				for (JSONObject json : jsonList) {
+					evaluator.addJsonObj(json);
+				}
+				
 				for (File file : textFileList) {
 					evaluator.addCV(file);
 				}

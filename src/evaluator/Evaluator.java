@@ -33,6 +33,10 @@ public class Evaluator {
 		}
 	}
 	
+	public void addJsonObj(JSONObject json) {
+		
+	}
+	
 	public void removeCV(File cvFile) {
 		String name = cvFile.getName();
 		if(cvMap.containsKey(name)) {
