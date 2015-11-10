@@ -359,27 +359,19 @@ public class MainViewController extends VBox {
 		ArrayList<String> filterMatchList = new ArrayList<String>();
 		
 		for (Filter f : this.filterData) {
-			filterList.add(f.getCategory());
+			filterList.add(f.getCategory() + ":" + f.getKey());
 			filterMatchList.add("match");
 		}
 		
 		for (int i=0; i<filterList.size(); i++) {
 			int index = i;
-			TableColumn filterColumn = new TableColumn(filterList.get(i));
-			filterColumn.setCellValueFactory(new Callback<CellDataFeatures<ObservableList<String>, String>, ObservableValue<String>>() {
-				@Override
-				public ObservableValue<String> call(CellDataFeatures<ObservableList<String>, String> param) {
-					return new SimpleObjectProperty(param.getValue().get((index+1)*2), "value", param.getValue().get((index+1)*2));
-				}
-			});
-			table.getColumns().add(filterColumn);
 			
-			TableColumn filterMatchColumn = new TableColumn(filterMatchList.get(i));
+			TableColumn filterMatchColumn = new TableColumn(filterList.get(i));
 			filterMatchColumn.setCellFactory(this.resultTableCellFactory);
 			filterMatchColumn.setCellValueFactory(new Callback<CellDataFeatures<ObservableList<String>, String>, ObservableValue<String>>() {
 				@Override
 				public ObservableValue<String> call(CellDataFeatures<ObservableList<String>, String> param) {
-					return new SimpleObjectProperty(param.getValue().get((index+1)*2+1), "value", param.getValue().get((index+1)*2+1));
+					return new SimpleObjectProperty(param.getValue().get(index+2), "value", param.getValue().get(index+2));
 				}
 			});
 			table.getColumns().add(filterMatchColumn);
@@ -570,7 +562,6 @@ public class MainViewController extends VBox {
 				    row.add(Integer.toString(result.getMark()));
 				    
 				    for (int i=0; i<result.getFilterString().size(); i++) {
-				    	row.add(filterList.get(i).getCategory() + " " + filterList.get(i).getKeyword());
 				    	row.add(result.getFilterString().get(i));
 				    }
 
