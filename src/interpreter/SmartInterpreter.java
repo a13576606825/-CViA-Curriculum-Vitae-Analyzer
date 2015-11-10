@@ -40,7 +40,7 @@ public class SmartInterpreter {
 		try (BufferedReader br = new BufferedReader(new FileReader(toInterprete))) {
 		    String line;
 		    while ((line = br.readLine()) != null) {
-		    	Utils.debug("Prcoess line: " + line);
+		    	//Utils.debug("Prcoess line: " + line);
 		    	processLine(line); // process the line.
 		    }
 		    
@@ -63,10 +63,13 @@ public class SmartInterpreter {
 				file.delete();
 				file.createNewFile();
 			}
-			FileWriter fw = new FileWriter(file.getAbsoluteFile());
-			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(exportDataMap.toJSONString());
-			bw.close();
+			boolean shouldWrite = true;
+			if(shouldWrite) {
+				FileWriter fw = new FileWriter(file.getAbsoluteFile());
+				BufferedWriter bw = new BufferedWriter(fw);
+				bw.write(exportDataMap.toJSONString());
+				bw.close();
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -78,7 +81,7 @@ public class SmartInterpreter {
 	public void processLine(String line) {
 		String possibleNewCate = InterpreterRule.isNewCategory(line);
 		if(possibleNewCate != InterpreterRule.InvalidCategory) {
-			Utils.debug("-----------------Foudn a new Category:" +possibleNewCate+"-----------------");
+			//Utils.debug("-----------------Foudn a new Category:" +possibleNewCate+"-----------------");
 			
 			finalizeCategory();
 			currentCategory = possibleNewCate;
@@ -99,7 +102,7 @@ public class SmartInterpreter {
 			
 			if(v != null) {
 				addValueToCurrentDataMap(entry.name, v.toString());
-				Utils.debug("-----------------Foudn a new definedValue of type:" +v.getType().toString()+"-----------------");
+				//Utils.debug("-----------------Foudn a new definedValue of type:" +v.getType().toString()+"-----------------");
 				
 			}
 		}
@@ -168,9 +171,9 @@ public class SmartInterpreter {
 	public static void main(String[] args) {
 //		SmartInterpreter test = new SmartInterpreter(new File(Utils.TEST_TEMP_PATH + "DesmondLim.txt"));
 //		SmartInterpreter test = new SmartInterpreter(new File(Utils.TEST_TEMP_PATH + "CV_Yamini_Bhaskar.txt"));
-//		SmartInterpreter test = new SmartInterpreter(new File(Utils.TEST_TEMP_PATH + "CV_Praveen.txt"));
+		SmartInterpreter test = new SmartInterpreter(new File(Utils.TEST_TEMP_PATH + "CV_Praveen.txt"));
 //		SmartInterpreter test = new SmartInterpreter(new File(Utils.TEST_TEMP_PATH + "DonnabelleEmbodo.txt"));
-		SmartInterpreter test = new SmartInterpreter(new File(Utils.TEST_TEMP_PATH + "RussellOng.txt"));
+//		SmartInterpreter test = new SmartInterpreter(new File(Utils.TEST_TEMP_PATH + "RussellOng.txt"));
 		
 		test.build();
 		

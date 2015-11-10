@@ -21,7 +21,7 @@ public enum PredefinedValuesType {
     }
 
     public boolean equalsName(String otherName) {
-        return (otherName == null) ? false : name.equals(otherName);
+        return (otherName == null) ? false : name.equalsIgnoreCase(otherName);
     }
 
     public String toString() {
