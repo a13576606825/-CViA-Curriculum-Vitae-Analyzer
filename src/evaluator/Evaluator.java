@@ -1,6 +1,7 @@
 package evaluator;
 
 import interpreter.InterpreterRule;
+import interpreter.SmartDictionary;
 import interpreter.SmartInterpreter;
 import interpreter.CategoryRule.CategoryEntry;
 
@@ -44,7 +45,7 @@ public class Evaluator {
 		}
 	}
 	
-	public ArrayList<Result> query(ArrayList<Filter> filters) {
+	public ArrayList<Result> query(ArrayList<Requirement> filters) {
 		
 		ArrayList<Result> resultList = new ArrayList<Result>();
 		for (Entry<String, JSONObject> cvEntry : cvMap.entrySet()) {
@@ -52,7 +53,7 @@ public class Evaluator {
 		    int currentScore = 0;
 		    JSONObject currentCV = cvEntry.getValue();
 		    ArrayList<String> filterStringList = new ArrayList<String>();
-		    for (Filter filter: filters) {
+		    for (Requirement filter: filters) {
 		    	String category = filter.getCategory();
 		    	String type = filter.getType();
 		    	String keyword = filter.getKeyword();
@@ -61,26 +62,40 @@ public class Evaluator {
 		    	Comparator comparator = filter.getComparator();
 		    			    	
 		    	JSONArray typeArray = (JSONArray) currentCV.get(category);
-		    	
-		    	String auxilaryInfo = ""; 
-		    	//boolean foundMatch = false;
-		    	
-		    	for(Iterator iterator = typeArray.iterator(); iterator.hasNext();) {
-					JSONObject entry =  (JSONObject)iterator.next();
-					if(entry.containsKey(type)) {
-						PredefinedValue value = PredefinedValuesFactory.fromString((String)entry.get(type), type);
-						String info = (String)entry.get("Info");
-						
-						if(value != null &&value.compare(comparator, toCompare) && info.contains(keyword)){
-							currentScore += PriorityWeight;
-							auxilaryInfo += "|Matched| " + info ;			
+		    
+		    	if(typeArray != null) {
+		    		String auxilaryInfo = ""; 
+			    	//boolean foundMatch = false;
+
+			    	for(Iterator iterator = typeArray.iterator(); iterator.hasNext();) {
+						JSONObject entry =  (JSONObject)iterator.next();
+						if(type==null || type.trim().equalsIgnoreCase("")) {
+							// only do string match
+							String info = (String)entry.get("info");
+							if(keyword == "" || SmartDictionary.containsIgnoreConjugation(info, keyword)) {
+								currentScore += PriorityWeight;
+								auxilaryInfo += "|Matched| " + info ;
+							}
+									
+						} else {
+							if(entry.containsKey(type)) {
+								PredefinedValue value = PredefinedValuesFactory.fromString((String)entry.get(type), type);
+								String info = (String)entry.get("info");
+								
+								if(value != null &&value.compare(comparator, toCompare) && (keyword == "" || SmartDictionary.containsIgnoreConjugation(info, keyword))){
+									currentScore += PriorityWeight;
+									auxilaryInfo += "|Matched| " + info ;			
+								}
+								
+							}
 						}
 						
+						
 					}
-					
-				}
-		    	filterStringList.add(auxilaryInfo);
+			    	filterStringList.add(auxilaryInfo);
+			    }
 		    }
+		    	
 		    
 		    Result res = new Result(currentName, currentScore, filterStringList);
 		    resultList.add(res);

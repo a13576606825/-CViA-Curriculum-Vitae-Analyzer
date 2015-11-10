@@ -30,9 +30,9 @@ public class Result implements Comparable<Result> {
 	@Override
 	public int compareTo(Result o) {
 		if(marks > o.marks) {
-			return 1;
-		} else if(marks < o.marks) {
 			return -1;
+		} else if(marks < o.marks) {
+			return 1;
 		} else {
 			return 0;
 		}

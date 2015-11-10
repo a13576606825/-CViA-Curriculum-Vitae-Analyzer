@@ -37,7 +37,29 @@ public class SmartDictionary {
 			}
 	
 	
-	
+	public static boolean containsIgnoreConjugation(String para, String words){
+		/*
+		String[] paraArray = para.split(" ");
+		String[] wordArray = words.split(" ");
+		
+		for(String word: wordArray) {
+			boolean isFoundWord = false;
+			for(String paraWord: paraArray) {
+				if(equalsIgnoreConjugation(paraWord, word)) {
+					isFoundWord = true;
+				}
+			} 
+			if(!isFoundWord) {
+				return false;
+			}
+		}
+		return true;
+		*/
+		if(para == null) {
+			return false;
+		}
+		return para.toLowerCase().contains(words.toLowerCase());
+	}
 	
 	public static boolean equalsIgnoreConjugation(String word, String anoWord){
 		if(dict == null || !dict.isOpen()) {
@@ -51,7 +73,6 @@ public class SmartDictionary {
 //		Utils.debug(l1.size() + " " + l2.size());
 		for(String a : l1) {
 			for(String b : l2) {
-				 
 				if(!a.isEmpty() && a != null && a.equalsIgnoreCase(b)){
 					return true;
 				}
@@ -59,5 +80,9 @@ public class SmartDictionary {
 		}
 		return false;
 	
+	}
+	
+	public static void main(String[] args) { 
+		Utils.debug(containsIgnoreConjugation("dsaas Java sadl", "java")+"");
 	}
 }

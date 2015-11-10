@@ -50,7 +50,11 @@ public class InterpreterRule {
 		ArrayList<String> output = new ArrayList<String>();
 		CategoryRule categoryRule  = getRuleForCategory(category);
 		for(CategoryEntry entry: categoryRule.getCategoryEntries()) {
-			output.add(entry.type);
+			if(!entry.type.equalsIgnoreCase("Info")) {
+				output.add(entry.type);
+			}
+			
+			
 		}
 		return output;
 		

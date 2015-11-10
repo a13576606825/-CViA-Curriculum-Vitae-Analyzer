@@ -1,6 +1,6 @@
 package evaluator;
 
-public class Filter {
+public class Requirement {
 	
 	private String category;
 	private String type;
@@ -9,11 +9,11 @@ public class Filter {
 	private String value;
 	private Priority priority;
 	
-	public Filter() {
+	public Requirement() {
 	
 	}
 	
-	public Filter(String category, String type, String keyword, Comparator comparator, String value, Priority priority) {
+	public Requirement(String category, String type, String keyword, Comparator comparator, String value, Priority priority) {
 		this.category = category;
 		this.type = type;
 		this.keyword = keyword;

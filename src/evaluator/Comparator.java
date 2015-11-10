@@ -50,7 +50,9 @@ public enum Comparator {
 			return s1 <= s2;
 		} else if(this == NotEqual) {
 			return s1 != s2;
-		} 
+		}  else if(this == Empty) {
+			return true;
+		}
 		return false;
 	}
 	

@@ -36,6 +36,9 @@ public class SmartInfo implements PredefinedValue {
 	@Override
 	public boolean compare(Comparator comparator, String toCompare) {
 		// TODO Auto-generated method stub
-		return false;
+		if(toCompare==null || toCompare=="") {
+			return true;
+		}
+		return info.toLowerCase().contains(toCompare.toLowerCase());
 	}
 }

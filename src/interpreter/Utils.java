@@ -5,7 +5,6 @@ import java.util.ArrayList;
 public class Utils {
 	
 	public static final String WordNetPath = "/usr/local/Cellar/wordnet/3.1/dict";
-	
 	public static final String TEST_TEMP_PATH = "test/temp/";
 	
 	
