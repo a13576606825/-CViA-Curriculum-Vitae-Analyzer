@@ -14,7 +14,6 @@ import evaluator.Priority;
 import evaluator.Result;
 import interpreter.InterpreterRule;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -54,6 +53,8 @@ public class MainViewController extends VBox {
 	private static final String TXT = "txt";
 	private static final String XLS = "xls";
 	private static final String XML = "xml";
+	
+	private static final String BASE_PATH = "test/CVs";
 	
 	private static final String TITLE_TEXT = "CViA";
 	private static final double TITLE_WIDTH = 90;
@@ -454,7 +455,7 @@ public class MainViewController extends VBox {
 			public void handle(ActionEvent event) {
 				FileChooser fileChooser = new FileChooser();
 				fileChooser.setTitle("Choose a file...");
-				fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+				fileChooser.setInitialDirectory(new File(BASE_PATH));
 				File file = fileChooser.showOpenDialog(importSingleButton.getScene().getWindow());
                 // Process the file
 				if (file != null && file.isFile()) {
@@ -470,7 +471,7 @@ public class MainViewController extends VBox {
 			public void handle(ActionEvent event) {
 				DirectoryChooser dirChooser = new DirectoryChooser();
 				dirChooser.setTitle("Choose a folder...");
-				dirChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+				dirChooser.setInitialDirectory(new File(BASE_PATH));
 				File dir = dirChooser.showDialog(importMultipleButton.getScene().getWindow());
                 // Process the file
 				if (dir != null && dir.isDirectory()) {
@@ -520,7 +521,13 @@ public class MainViewController extends VBox {
 				
 				resultList =  evaluator.query(filterList);
 				
+				for (int i=0; i<resultList.size(); i++) {
+					System.out.println(resultList.get(i).getMark());
+				}
 				
+				for (Result r : resultList) {
+					resultData.add(new EvaluatedRecord(r.getfileName(), String.valueOf(r.getMark())));
+				}
 			
 			}
 		});
@@ -728,20 +735,20 @@ public class MainViewController extends VBox {
 	
 	public static class EvaluatedRecord {
 		private final SimpleStringProperty filename;
-		private final SimpleIntegerProperty score;
+		private final SimpleStringProperty score;
 		private final ArrayList<String> filterList;
 		private final ArrayList<String> filterMatchList;
 		
-		public EvaluatedRecord(String filename, int score) {
+		public EvaluatedRecord(String filename, String score) {
 			this.filename = new SimpleStringProperty(filename);
-			this.score = new SimpleIntegerProperty(score);
+			this.score = new SimpleStringProperty(score);
 			this.filterList = new ArrayList<String>();
 			this.filterMatchList = new ArrayList<String>();
 		}
 		
-		public EvaluatedRecord(String filename, int score, ArrayList<String> filterList, ArrayList<String> filterMatchList) {
+		public EvaluatedRecord(String filename, String score, ArrayList<String> filterList, ArrayList<String> filterMatchList) {
 			this.filename = new SimpleStringProperty(filename);
-			this.score = new SimpleIntegerProperty(score);
+			this.score = new SimpleStringProperty(score);
 			this.filterList = filterList;
 			this.filterMatchList = filterMatchList;
 		}
@@ -754,11 +761,11 @@ public class MainViewController extends VBox {
 			this.filename.set(filename);
 		}
 		
-		public int getScore() {
+		public String getScore() {
 			return score.get();
 		}
 		
-		public void setScore(int score) {
+		public void setScore(String score) {
 			this.score.set(score);
 		}
 		
