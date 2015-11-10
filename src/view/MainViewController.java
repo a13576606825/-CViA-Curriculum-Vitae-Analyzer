@@ -18,6 +18,7 @@ import evaluator.Result;
 import interpreter.InterpreterRule;
 import interpreter.SmartInterpreter;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -27,15 +28,15 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
@@ -69,9 +70,9 @@ public class MainViewController extends VBox {
 	private static final double ICON_WIDTH = 50;
 	private static final double ICON_HEIGHT = 50;
 	
-	private static final String IMPORT_SINGLE_BUTTON_TEXT = "Add a CV";
+	private static final String IMPORT_SINGLE_BUTTON_TEXT = "Add CV";
 	private static final String IMPORT_MULTIPLE_BUTTON_TEXT = "Add CVs";
-	private static final String FILTER_BUTTON_TEXT = "Add Requirement";
+	private static final String FILTER_BUTTON_TEXT = "Add Req";
 	private static final String PROCESS_BUTTON_TEXT = "Analyse";
 	private static final String EXPORT_BUTTON_TEXT = "Export";
 	
@@ -101,6 +102,7 @@ public class MainViewController extends VBox {
 			);
 	
 	private ObservableList<EvaluatedRecord> resultData = FXCollections.observableArrayList();
+	private ObservableList<ObservableList<String>> evaluatedResultData = FXCollections.observableArrayList(); 
 	
 	private double stageWidth;
 	@SuppressWarnings("unused")
@@ -126,7 +128,8 @@ public class MainViewController extends VBox {
 	
 	private TableView<FileObject> fileTable;
 	private TableView<Filter> filterTable;
-	private TableView<EvaluatedRecord> resultTable;
+	@SuppressWarnings("rawtypes")
+	private TableView resultTable;
 	
 	private ArrayList<File> originalFileList;
 	private ArrayList<File> textFileList;
@@ -142,6 +145,9 @@ public class MainViewController extends VBox {
 	private Callback<TableColumn<Filter, String>, TableCell<Filter, String>> comparatorComboBoxCellFactory;
 	private Callback<TableColumn<Filter, String>, TableCell<Filter, String>> valueComboBoxCellFactory;
 	private Callback<TableColumn<Filter, String>, TableCell<Filter, String>> priorityComboBoxCellFactory;
+	
+	@SuppressWarnings("rawtypes")
+	private Callback<TableColumn, TableCell> resultTableCellFactory;
 	
 	
 	private ArrayList<evaluator.Requirement> filterList;
@@ -167,6 +173,8 @@ public class MainViewController extends VBox {
 		comparatorComboBoxCellFactory = (TableColumn<Filter, String> param) -> new ComparatorComboBoxCell();
 		valueComboBoxCellFactory = (TableColumn<Filter, String> param) -> new ValueComboBoxCell();
 		priorityComboBoxCellFactory = (TableColumn<Filter, String> param) -> new PriorityComboBoxCell();
+		
+		resultTableCellFactory = (@SuppressWarnings("rawtypes") TableColumn param) -> new EvaluatedResultTableCell();
 	}
 	
 	private void initializeList() {
@@ -190,6 +198,7 @@ public class MainViewController extends VBox {
 		this.widthBetweenTable = (this.stageWidth - MainViewController.FILE_TABLE_WIDTH - MainViewController.FILTER_TABLE_WIDTH)/3;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private void initializeMainView() {
 		iconImageView = new ImageView();
         iconImage = new Image(MainView.class.getResourceAsStream(ICON_PATH));
@@ -216,7 +225,7 @@ public class MainViewController extends VBox {
 		preprocessBox = new HBox();
 		preprocessBox.getChildren().addAll(fileTable, filterTable);
 		
-		resultTable = new TableView<EvaluatedRecord>();
+		resultTable = new TableView();
 		
 		resultBox = new VBox();
 		resultBox.getChildren().addAll(resultTable);
@@ -323,34 +332,62 @@ public class MainViewController extends VBox {
 		table.setEditable(true);
 	}
 	
-	private void initializeResultTableView(TableView<EvaluatedRecord> table) {
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void initializeResultTableView(TableView table) {
 		table.getColumns().clear();
-		resultData.clear();
-		TableColumn<EvaluatedRecord, String> filenameColumn = new TableColumn<EvaluatedRecord, String>("Filename");
-		filenameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-		filenameColumn.setCellValueFactory(new PropertyValueFactory<EvaluatedRecord, String>("filename"));
+		evaluatedResultData.clear();
+		TableColumn filenameColumn = new TableColumn("Filename");
+		//filenameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+		//filenameColumn.setCellValueFactory(new PropertyValueFactory<EvaluatedRecord, String>("filename"));
+		filenameColumn.setCellValueFactory(new Callback<CellDataFeatures<ObservableList<String>, String>, ObservableValue<String>>() {
+			@Override
+			public ObservableValue<String> call(CellDataFeatures<ObservableList<String>, String> param) {
+				return new SimpleObjectProperty(param.getValue().get(0), "value", param.getValue().get(0));
+			}
+		});
 		table.getColumns().add(filenameColumn);
 		
-		TableColumn<EvaluatedRecord, String> scoreColumn = new TableColumn<EvaluatedRecord, String>("Score");
-		scoreColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-		scoreColumn.setCellValueFactory(new PropertyValueFactory<EvaluatedRecord, String>("score"));
+		TableColumn scoreColumn = new TableColumn("Score");
+		//scoreColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+		//scoreColumn.setCellValueFactory(new PropertyValueFactory<EvaluatedRecord, String>("score"));
+		scoreColumn.setCellValueFactory(new Callback<CellDataFeatures<ObservableList<String>, String>, ObservableValue<String>>() {
+			@Override
+			public ObservableValue<String> call(CellDataFeatures<ObservableList<String>, String> param) {
+				return new SimpleObjectProperty(param.getValue().get(1), "value", param.getValue().get(1));
+			}
+		});
 		table.getColumns().add(scoreColumn);
 		
 		ArrayList<String> filterList = new ArrayList<String>();
 		ArrayList<String> filterMatchList = new ArrayList<String>();
 		
 		for (Filter f : this.filterData) {
-			filterList.add(f.getCategory() + ":" + f.getKey());
-			filterMatchList.add(f.getCategory() + " match");
+			filterList.add(f.getCategory());
+			System.out.println(f.getCategory());
+			filterMatchList.add("match");
 		}
-		
+		System.out.println(filterList.size());
 		for (int i=0; i<filterList.size(); i++) {
-			TableColumn<EvaluatedRecord, String> filterColumn = new TableColumn<EvaluatedRecord, String>(filterList.get(i));
-			filenameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+			int index = i;
+			
+			TableColumn filterColumn = new TableColumn(filterList.get(i));
+			filterColumn.setCellValueFactory(new Callback<CellDataFeatures<ObservableList<String>, String>, ObservableValue<String>>() {
+				@Override
+				public ObservableValue<String> call(CellDataFeatures<ObservableList<String>, String> param) {
+					return new SimpleObjectProperty(param.getValue().get((index+1)*2), "value", param.getValue().get((index+1)*2));
+				}
+			});
 			table.getColumns().add(filterColumn);
 			
-			TableColumn<EvaluatedRecord, String> filterMatchColumn = new TableColumn<EvaluatedRecord, String>(filterMatchList.get(i));
-			scoreColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+			TableColumn filterMatchColumn = new TableColumn(filterMatchList.get(i));
+			filterMatchColumn.setCellFactory(this.resultTableCellFactory);
+			filterMatchColumn.setCellValueFactory(new Callback<CellDataFeatures<ObservableList<String>, String>, ObservableValue<String>>() {
+				@Override
+				public ObservableValue<String> call(CellDataFeatures<ObservableList<String>, String> param) {
+					return new SimpleObjectProperty(param.getValue().get((index+1)*2+1), "value", param.getValue().get((index+1)*2+1));
+				}
+			});
 			table.getColumns().add(filterMatchColumn);
 		}
 
@@ -507,12 +544,9 @@ public class MainViewController extends VBox {
 		});
 		
 		processButton.setOnAction(new EventHandler<ActionEvent>() {
+			@SuppressWarnings("unchecked")
 			@Override
 			public void handle(ActionEvent event) {
-				initializeResultTableView(resultTable);
-				resultTable.setItems(resultData);
-				
-				//final String dir = System.getProperty("user.dir");
 		        
 				for (File file : originalFileList) {
 					addFile(true, CVReader.convertFile(file));
@@ -537,15 +571,28 @@ public class MainViewController extends VBox {
 					evaluator.addCV(file);
 				}
 				
+				System.out.println("start evaluating");
 				resultList =  evaluator.query(filterList);
+				System.out.println("finish evaluating");
 				
-				for (int i=0; i<resultList.size(); i++) {
-					System.out.println(resultList.get(i).getMark());
+				initializeResultTableView(resultTable);
+				resultTable.setItems(evaluatedResultData);
+				
+				
+				for(Result result : resultList) {
+					ObservableList<String> row = FXCollections.observableArrayList();
+				    row.add(result.getfileName().replace(".txt", ""));
+				    row.add(Integer.toString(result.getMark()));
+				    
+				    for (int i=0; i<result.getFilterString().size(); i++) {
+				    	row.add(filterList.get(i).getCategory() + " " + filterList.get(i).getKeyword());
+				    	row.add(result.getFilterString().get(i));
+				    }
+				    System.out.println("one row added");
+				    resultTable.getItems().add(row);
 				}
 				
-				for (Result r : resultList) {
-					resultData.add(new EvaluatedRecord(r.getfileName(), String.valueOf(r.getMark())));
-				}
+				System.out.println("finish processing");
 			
 			}
 		});
@@ -616,10 +663,10 @@ public class MainViewController extends VBox {
 	}
 	
 	private String getType(File file) {
-		if (file.exists() && file.isFile()) {
+		if (file.exists() && !file.isDirectory() && file.isFile()) {
 			String filename = file.getName();
 			String[] tokens = filename.split("\\.(?=[^\\.]+$)");
-			
+			System.out.println(tokens[1]);
 			return tokens[1];
 		}
 		
@@ -794,6 +841,16 @@ public class MainViewController extends VBox {
 		public ArrayList<String> getFilterMatchList() {
 			return this.filterMatchList;
 		}
+	}
+	
+	public class EvaluatedResultTableCell extends TableCell<String, String>{
+		@Override
+		public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            this.setText(item);
+            this.setTooltip(
+                    (empty || item==null) ? null : new Tooltip(item));
+        }
 	}
 	
 	public class CategoryComboBoxCell extends TableCell<Filter, String> {
@@ -1220,9 +1277,7 @@ public class MainViewController extends VBox {
                 	Desktop dt = Desktop.getDesktop();
                     try {
 						if (file == null) {
-							Alert alert = new Alert(AlertType.INFORMATION);
-							alert.setTitle("Information Dialog");
-							alert.showAndWait();
+							System.out.println("Error");
 						} else {
 							dt.open(file);
 						}
@@ -1240,8 +1295,9 @@ public class MainViewController extends VBox {
             if(!empty){
             	viewButton.setStyle("-fx-text-fill: green;");
             	cellButton.setStyle("-fx-text-fill: red;");
-            	buttonPart.getChildren().add(viewButton);
+            	buttonPart.getChildren().clear();
             	buttonPart.getChildren().add(cellButton);
+            	buttonPart.getChildren().add(viewButton);
             	buttonPart.setPadding(new Insets(0, 0, 0, 7));
                 setGraphic(buttonPart);
             } else {
