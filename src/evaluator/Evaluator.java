@@ -93,7 +93,9 @@ public class Evaluator {
 						
 					}
 			    	filterStringList.add(auxilaryInfo);
-			    }
+		    	} else {
+		    		filterStringList.add(""); // add emptyString
+		    	}
 		    }
 		    	
 		    
