@@ -10,7 +10,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.json.simple.JSONArray;
@@ -19,7 +18,6 @@ import org.json.simple.parser.JSONParser;
 
 import predefinedValues.PredefinedValue;
 import predefinedValues.PredefinedValuesFactory;
-import predefinedValues.PredefinedValuesType;
 
 public class SmartInterpreter {
 
@@ -131,6 +129,7 @@ public class SmartInterpreter {
 		
 		infoBuffer+= (line + " ");
 	}
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void finalizeCategory() {
 		
 		
@@ -148,6 +147,7 @@ public class SmartInterpreter {
 		currentDataMap.clear();
 	}
 
+	@SuppressWarnings({ "unused", "unchecked" })
 	private JSONArray exportCategoryData() {
 		pushBufferInfo();
 		JSONArray returned = new JSONArray();
@@ -159,6 +159,7 @@ public class SmartInterpreter {
 		 
 		
 	}
+	@SuppressWarnings("unchecked")
 	private void addValueToCurrentDataMap(String name, String value) {
 		if(currentDataMap.size() == 0) {
 			JSONObject newMap = new JSONObject();
@@ -176,6 +177,7 @@ public class SmartInterpreter {
 			}
 		}
 	}
+	@SuppressWarnings("unchecked")
 	private void pushBufferInfo() {
 		if(currentDataMap.size() == 0) {
 			JSONObject newMap = new JSONObject();

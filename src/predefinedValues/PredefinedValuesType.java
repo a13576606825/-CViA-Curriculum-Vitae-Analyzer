@@ -1,7 +1,5 @@
 package predefinedValues;
 
-import interpreter.Utils;
-
 import java.util.ArrayList;
 
 public enum PredefinedValuesType {

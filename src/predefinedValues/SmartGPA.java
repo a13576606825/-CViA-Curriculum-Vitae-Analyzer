@@ -1,7 +1,5 @@
 package predefinedValues;
 
-import java.util.Date;
-
 import evaluator.Comparator;
 
 public class SmartGPA implements PredefinedValue {

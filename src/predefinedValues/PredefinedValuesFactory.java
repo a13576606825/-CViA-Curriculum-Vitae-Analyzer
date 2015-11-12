@@ -38,6 +38,7 @@ public class PredefinedValuesFactory {
 		return null;
 	}
 	
+	@SuppressWarnings("unused")
 	public static PredefinedValue getGPA(String line) {
 		Pattern p = Pattern.compile("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?/[0-9]*",
 			    Pattern.CASE_INSENSITIVE);
@@ -50,6 +51,7 @@ public class PredefinedValuesFactory {
 		return null;
 	}
 	
+	@SuppressWarnings("unused")
 	public static PredefinedValue getNumber(String line) {
 		Set<PredefinedValue> numbers = new HashSet<PredefinedValue>();
 		
@@ -69,6 +71,7 @@ public class PredefinedValuesFactory {
 		return null;
 	}
 	
+	@SuppressWarnings("unused")
 	public static PredefinedValue getEmail(String line) {
 		Pattern p = Pattern.compile("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b",
 			    Pattern.CASE_INSENSITIVE);
@@ -89,6 +92,7 @@ public class PredefinedValuesFactory {
 		return false;
 		
 	}
+	@SuppressWarnings("unused")
 	public static PredefinedValue getEducationLevel(String line) {
 		Set<PredefinedValue> levels = new HashSet<PredefinedValue>();
 		String[] phd = {"PhD"};
@@ -113,6 +117,7 @@ public class PredefinedValuesFactory {
 		
 	}
 	
+	@SuppressWarnings("unused")
 	public static PredefinedValue getDate(String line) {
 		Parser parser = new Parser();
 		line.replaceAll("present", "now");

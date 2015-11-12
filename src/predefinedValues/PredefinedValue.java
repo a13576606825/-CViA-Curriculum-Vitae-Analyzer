@@ -1,7 +1,5 @@
 package predefinedValues;
 
-import java.util.ArrayList;
-
 import evaluator.Comparator;
 
 public interface PredefinedValue extends Comparable<PredefinedValue> {

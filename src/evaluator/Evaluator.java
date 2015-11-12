@@ -1,9 +1,7 @@
 package evaluator;
 
-import interpreter.InterpreterRule;
 import interpreter.SmartDictionary;
 import interpreter.SmartInterpreter;
-import interpreter.CategoryRule.CategoryEntry;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,6 +43,7 @@ public class Evaluator {
 		}
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public ArrayList<Result> query(ArrayList<Requirement> filters) {
 		
 		ArrayList<Result> resultList = new ArrayList<Result>();
@@ -74,7 +73,7 @@ public class Evaluator {
 							String info = (String)entry.get("info");
 							if(keyword == "" || SmartDictionary.containsIgnoreConjugation(info, keyword)) {
 								currentScore += PriorityWeight;
-								auxilaryInfo += "|Matched| " + info ;
+								auxilaryInfo += info;
 							}
 									
 						} else {
@@ -84,7 +83,7 @@ public class Evaluator {
 								
 								if(value != null &&value.compare(comparator, toCompare) && (keyword == "" || SmartDictionary.containsIgnoreConjugation(info, keyword))){
 									currentScore += PriorityWeight;
-									auxilaryInfo += "|Matched| " + info ;			
+									auxilaryInfo += info;			
 								}
 								
 							}

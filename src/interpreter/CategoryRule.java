@@ -6,8 +6,6 @@ import java.util.Iterator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import predefinedValues.PredefinedValuesType;
-
 public class CategoryRule {
 	private boolean isMultipleEntry;
 	private ArrayList<String> primaryKeys;
@@ -15,6 +13,7 @@ public class CategoryRule {
 	private ArrayList<CategoryEntry> categoryEntries;
 	
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public CategoryRule(JSONObject obj) {
 		isMultipleEntry = false; 
 		primaryKeys = new  ArrayList<String>();

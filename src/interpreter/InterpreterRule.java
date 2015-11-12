@@ -4,7 +4,6 @@ import interpreter.CategoryRule.CategoryEntry;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,8 +13,6 @@ import java.util.Iterator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
-import predefinedValues.PredefinedValuesType;
 
 
 public class InterpreterRule {
@@ -147,6 +144,7 @@ public class InterpreterRule {
 		return false;
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static void extractCategoryList() {
 		
 		Iterator<JSONObject> itr = categoryRules.iterator();

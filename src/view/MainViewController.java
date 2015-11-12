@@ -37,7 +37,6 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.TooltipBuilder;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
@@ -51,6 +50,8 @@ import javafx.util.Callback;
 import parser.CVReader;
 import predefinedValues.PredefinedValuesType;
 
+import org.apache.commons.io.FilenameUtils;
+
 @SuppressWarnings("restriction")
 public class MainViewController extends VBox {
 	
@@ -58,6 +59,7 @@ public class MainViewController extends VBox {
 	private static final String DOCX = "docx";
 	private static final String PDF = "pdf";
 	private static final String TXT = "txt";
+	private static final String CSV = "csv";
 	
 	private static final String BASE_PATH = "test/CVs";
 	
@@ -99,7 +101,6 @@ public class MainViewController extends VBox {
 			new Filter("skill", "info", "java", "", "", "high")
 			);
 	
-	private ObservableList<EvaluatedRecord> resultData = FXCollections.observableArrayList();
 	private ObservableList<ObservableList<String>> evaluatedResultData = FXCollections.observableArrayList(); 
 	
 	private double stageWidth;
@@ -575,27 +576,20 @@ public class MainViewController extends VBox {
 		exportButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				DirectoryChooser dirChooser = new DirectoryChooser();
-				dirChooser.setTitle("Choose a folder...");
-				dirChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
-				File dir = dirChooser.showDialog(importMultipleButton.getScene().getWindow());
+				FileChooser fileChooser = new FileChooser();
+				fileChooser.setTitle("Save file");
+				fileChooser.setInitialFileName(EXPORT_FILE_NAME + "." + CSV);
+				File savedFile = fileChooser.showSaveDialog(exportButton.getScene().getWindow());
 				
-				if (dir != null && dir.isDirectory()) {
-					System.out.println(dir.getAbsolutePath() + "/" + EXPORT_FILE_NAME + "." + TXT);
-					File exportFile = new File(dir.getAbsolutePath() + "/" + EXPORT_FILE_NAME + "." + TXT);
-					if (!exportFile.exists()) {
-						try {
-							exportFile.createNewFile();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-					
+				if (savedFile != null) {
 					try {
-						BufferedWriter bw = new BufferedWriter(new FileWriter(exportFile.getAbsolutePath()));
+						BufferedWriter bw = new BufferedWriter(new FileWriter(savedFile.getAbsolutePath()));
 						
-						for (int i=0; i<resultData.size(); i++) {
-							bw.write(resultData.get(i).getFilename() + "   " + resultData.get(i).getScore());
+						for (int i=0; i<evaluatedResultData.size(); i++) {
+							bw.write(evaluatedResultData.get(i).get(0) + "," + evaluatedResultData.get(i).get(1));
+							for (int j=2; j<evaluatedResultData.get(i).size(); j++) {
+								bw.write("," + evaluatedResultData.get(i).get(j));
+							}
 							bw.newLine();
 							bw.flush();
 						}
@@ -604,7 +598,8 @@ public class MainViewController extends VBox {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-				}
+				} 
+
 			}
 		});
 	}
@@ -1228,7 +1223,7 @@ public class MainViewController extends VBox {
                 	//remove selected item from the table list
                 	fileData.remove(currentFile);
                 	for (int i=0; i<originalFileList.size(); i++) {
-                		if (currentFile.getFilename().equals(originalFileList.get(i).getName())) {
+                		if (FilenameUtils.removeExtension(currentFile.getFilename()).equals(originalFileList.get(i).getName())) {
                 			originalFileList.remove(i);
                 			break;
                 		}
