@@ -19,7 +19,7 @@ public class PredefinedValuesFactory {
 
 	
 	// empty string means no value can be obtained
-	public static PredefinedValue getValue(String line, String type) {
+	public static PredefinedValue extractValue(String line, String type) {
 		if(PredefinedValuesType.doesTypeExist(type)) {
 			if(PredefinedValuesType.Email.equalsName(type)) {
 				return getEmail(line);

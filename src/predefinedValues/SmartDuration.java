@@ -95,11 +95,11 @@ public class SmartDuration implements PredefinedValue {
 			return comparator.compareTwoDouble(self/daysPerYear, toCompareDouble);
 			
 		} catch(NumberFormatException e) {
-		  
+			return false;
 		}
 		
 		
-		return false;
+		
 	}
 
 }
