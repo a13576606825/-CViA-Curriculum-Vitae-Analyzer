@@ -80,10 +80,10 @@ public class SmartGPA implements PredefinedValue {
 			return comparator.compareTwoDouble(self, toCompareDouble);
 			
 		} catch(NumberFormatException e) {
-			
+			return false;
 		}
 		
 		
-		return false;
+		
 	}
 }

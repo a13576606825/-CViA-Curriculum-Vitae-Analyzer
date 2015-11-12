@@ -120,7 +120,7 @@ public class SmartInterpreter {
 		for(CategoryEntry entry: entries) {
 			
 			String valueType = entry.type;
-			PredefinedValue v = PredefinedValuesFactory.getValue(line, valueType);
+			PredefinedValue v = PredefinedValuesFactory.extractValue(line, valueType);
 			
 			if(v != null) {
 				addValueToCurrentDataMap(entry.name, v.toString());

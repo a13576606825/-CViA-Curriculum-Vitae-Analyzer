@@ -56,8 +56,9 @@ public class SmartDate implements PredefinedValue {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			Utils.debug("fail to covert String to SmartDate");
+			return null;
 		}
-		return null;
+		
 	}
 
 	@Override
